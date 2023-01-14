@@ -53,14 +53,12 @@ async def gmquote(ctx):
 # gm quote add
 @bot.slash_command(name="gmquoteadd", guild_ids=[GUILD], description='Add a Gang Member Quote')
 async def gmquote(ctx: discord.ApplicationContext, quote: str, author: str, year: int):
-    quotedict = {"Quote":quote,"Author":author,"Year":year}
     
     quotelist = json.load(open('quotes.json'))
-
-    quotelist.append(quotedict)
-    
+    quotelist.append({"Quote":quote,"Author":author,"Year":year})    
     with open('quotes.json', 'w') as outfile:
         json.dump(quotelist, outfile)
+        
     await ctx.respond(f'> {quote}\n**~{author}, {year}**\n Quote successfully added!')
 
 
