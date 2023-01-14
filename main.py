@@ -11,24 +11,6 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('GUILD_ID')
 INTENTS = discord.Intents.all()
 
-# searchgame
-searchinggame = 882251818569195540
-bottest = 882574276765564989
-queue = []
-queuesize = 0
-queuestarted = False
-
-role_csgo = 1053745890613010442
-
-def startqueue():
-    global queuestarted
-    queuestarted = True
-
-def endqueue():
-    global queuestarted, queue
-    queuestarted = False
-
-
 
 bot = discord.Bot()
 
@@ -58,7 +40,7 @@ async def gmquote(ctx: discord.ApplicationContext, quote: str, author: str, year
     quotelist.append({"Quote":quote,"Author":author,"Year":year})    
     with open('quotes.json', 'w') as outfile:
         json.dump(quotelist, outfile)
-        
+
     await ctx.respond(f'> {quote}\n**~{author}, {year}**\n Quote successfully added!')
 
 
