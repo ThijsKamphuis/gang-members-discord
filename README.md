@@ -1,6 +1,6 @@
 THE OFFICIAL GANG MEMBERS DISCORD BOT
 =====================================
-Join the community now:
+Join the community:
 [Gang Members Discord](https://discord.gg/KDcSBqXefC) <br>
 Or check our website:
 [gangmembers.nl](https://matsdd.github.io/Gang-Members-Website/)
