@@ -7,4 +7,4 @@ s = p.stdout.readlines()[1].decode()
 
 if len(s) > 50:
     subprocess.Popen(["git", "pull"])
-    subprocess.Popen(["systemctl", "restart", "gang-members-discord"])
+    subprocess.Popen(["systemctl", "restart", "gang-members-discord"])#
