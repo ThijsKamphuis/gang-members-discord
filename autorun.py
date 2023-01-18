@@ -5,5 +5,6 @@ p = subprocess.Popen(["git", "status", "-uno"], stdout=subprocess.PIPE)
 
 s = p.stdout.readlines()[1].decode()
 
-print(s)#
-print(len(s))
+if len(s) > 50:
+    subprocess.Popen(["git", "pull"])
+    subprocess.Popen(["systemctl", "restart", "gang-members-discord"])
