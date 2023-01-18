@@ -5,4 +5,4 @@ p = subprocess.Popen(["git", "status", "-uno"], stdout=subprocess.PIPE)
 
 s = p.stdout.readlines()[1].decode()
 
-print(s)
+print(True if s else False)
