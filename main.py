@@ -115,7 +115,7 @@ async def motminit(ctx):
     await ch.send(embed=embed)
 
 
-@bot.slash_command(name="vote", guild_ids=[GUILD], description="Initialize MOTM")    
+@bot.slash_command(name="motmvote", guild_ids=[GUILD], description="Vote for MOTM")    
 async def vote(ctx: discord.ApplicationContext, member: discord.Member):
     pp = 2
 

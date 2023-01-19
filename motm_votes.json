@@ -1,14 +1,24 @@
-[
-    {
-        "User":"",
-        "Votes":""
-    },
-    {
-        "User":"",
-        "Votes":""
-    },
-    {
-        "User":"",
-        "Votes":""
-    }
-]
+{
+    "votes": [
+        {
+            "User":"Test",
+            "Votes":"0"
+        }
+    ],
+    
+    "Usersvoted": [
+        "reichsburger",
+        "test"
+    ]
+
+
+
+
+
+
+
+
+
+
+
+}
