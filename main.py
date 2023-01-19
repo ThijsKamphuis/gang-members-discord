@@ -5,7 +5,8 @@ import os
 from dotenv import load_dotenv
 import json
 import random
-import datetime
+from datetime import datetime
+from dateutil import relativedelta
 
 # .env
 load_dotenv()
@@ -59,7 +60,8 @@ motm_role_id = 1062507887718567986
 GMDev_id = 1059968168493318198
 GMAdmin_id = 882248427298230292
 
-# motm init
+time_until_next_motm: datetime.today() + relativedelta.relativedelta(months=1)
+
 
 @bot.slash_command(name="motminit", guild_ids=[GUILD], description="Initialize MOTM")
 @commands.has_any_role(GMDev_id, GMAdmin_id)
@@ -81,7 +83,7 @@ async def motminit(ctx):
 
     embed.add_field(
         name="Days left to vote:",
-        value="69",
+        value=time_until_next_motm,
         inline=True
     )
 
