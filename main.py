@@ -83,7 +83,7 @@ async def motminit(ctx):
 
     embed.add_field(
         name="Current MotM:",
-        value=f"<@{329535398860816385}>",
+        value=f"<@{motm.id}>",
         inline=True
     )
 
