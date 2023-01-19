@@ -7,7 +7,6 @@ import json
 import random
 from datetime import datetime
 from dateutil import relativedelta
-
 # .env
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
