@@ -19,6 +19,12 @@ gm_guild_id = 882248303822123018
 bot = discord.Bot(intents=INTENTS)
 
 
+motm_channel_id = 1065028419487793182
+motm_role_id = 1062507887718567986
+
+GMDev_id = 1059968168493318198
+GMAdmin_id = 882248427298230292
+
 
 def get_motm() -> discord.Member:
     motm = bot.get_guild(gm_guild_id).get_role(motm_role_id).members[0]
@@ -33,7 +39,7 @@ def votingdaysleft():
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Papa sleep"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="polish moments"))
 
 
 # 727
@@ -42,6 +48,8 @@ async def gif727(ctx):
     await ctx.respond(random.sample(json.load(open('gifs.json')), 1)[0])
     return    
 
+@bot.slash_command(name="motminit", guild_ids=[GUILD], description="Initialize MOTM")
+@commands.has_any_role(GMDev_id, GMAdmin_id)
 
 ##### QUOTES #####
 
@@ -64,12 +72,6 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 
 
 ##### MOTM #####
-
-motm_channel_id = 1065028419487793182
-motm_role_id = 1062507887718567986
-
-GMDev_id = 1059968168493318198
-GMAdmin_id = 882248427298230292
 
 # INIT
 @bot.slash_command(name="motminit", guild_ids=[GUILD], description="Initialize MOTM")
