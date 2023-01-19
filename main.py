@@ -33,6 +33,8 @@ def votingdaysleft():
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Papa sleep"))
+
 
 # 727
 @bot.slash_command(name="727", guild_ids=[GUILD], description='727?')
