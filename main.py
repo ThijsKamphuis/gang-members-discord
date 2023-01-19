@@ -7,6 +7,7 @@ import json
 import random
 from datetime import datetime
 from dateutil import relativedelta
+
 # .env
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -68,8 +69,8 @@ async def motminit(ctx):
 
     motm = get_motm()
 
-    next_motm_date = datetime.today() - relativedelta.relativedelta(months=1)
-    days_until_motm = str(next_motm_date.day)
+    voting_days_left = abs(datetime.today() - ((datetime.today() + (relativedelta.relativedelta(months=1))).replace(day=1, hour= 0, minute= 0, second=1, microsecond= 0)))
+
 
     embed = discord.Embed(
         title="Member of the Month",
@@ -84,7 +85,7 @@ async def motminit(ctx):
 
     embed.add_field(
         name="Days left to vote:",
-        value=days_until_motm,
+        value=str(voting_days_left),
         inline=True
     )
 
