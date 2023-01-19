@@ -67,7 +67,10 @@ async def motminit(ctx):
     await ctx.respond("Initializing MOTM")
 
     motm = get_motm()
-    time_until_next_motm = datetime.today() + relativedelta.relativedelta(months=1)
+
+    next_motm_date = datetime.today() - relativedelta.relativedelta(months=1)
+    days_until_motm = str(next_motm_date.day)
+
     embed = discord.Embed(
         title="Member of the Month",
         color=0xffffff
@@ -81,7 +84,7 @@ async def motminit(ctx):
 
     embed.add_field(
         name="Days left to vote:",
-        value=time_until_next_motm,
+        value=days_until_motm,
         inline=True
     )
 
