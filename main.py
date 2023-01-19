@@ -22,6 +22,10 @@ def get_motm() -> discord.Member:
     motm = bot.get_guild(gm_guild_id).get_role(motm_role_id).members[0]
     return motm
 
+def votingdaysleft():
+    voting_days_left = (abs(datetime.today() - ((datetime.today() + (relativedelta.relativedelta(months=1))).replace(day=1, hour= 0, minute= 0, second=1, microsecond= 0)))).days
+    return voting_days_left
+
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
@@ -69,9 +73,9 @@ async def motminit(ctx):
 
     motm = get_motm()
 
-    voting_days_left = (abs(datetime.today() - ((datetime.today() + (relativedelta.relativedelta(months=1))).replace(day=1, hour= 0, minute= 0, second=1, microsecond= 0)))).days
+    
 
-
+    global embed
     embed = discord.Embed(
         title="Member of the Month",
         color=0xffffff
@@ -85,7 +89,7 @@ async def motminit(ctx):
 
     embed.add_field(
         name="Days left to vote:",
-        value=str(voting_days_left),
+        value=str(votingdaysleft()),
         inline=True
     )
 
@@ -100,7 +104,7 @@ async def motminit(ctx):
     )
 
     embed.set_footer(text="Use /motmvote @user to vote!")
-
+    global ch
     ch = bot.get_channel(motm_channel_id)
     await ch.purge()
 
@@ -110,6 +114,18 @@ async def motminit(ctx):
 @bot.slash_command(name="vote", guild_ids=[GUILD], description="Initialize MOTM")    
 async def vote(ctx):
     return
+
+
+# Check for new day
+if not datetime.today().hour:
+    async def update_embed():
+
+        votingdaysleft()
+        
+        await ch.purge()
+        await ch.send(embed=embed)
+
+
 
 
 
