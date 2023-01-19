@@ -116,8 +116,9 @@ async def motminit(ctx):
 
 
 @bot.slash_command(name="vote", guild_ids=[GUILD], description="Initialize MOTM")    
-async def vote(ctx: discord.ApplicationContext, user: int):
-    return
+async def vote(ctx: discord.ApplicationContext, member: discord.Member):
+    pp = 2
+
 
 
 # Check for new day
