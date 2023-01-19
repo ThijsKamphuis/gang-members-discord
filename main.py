@@ -59,7 +59,6 @@ motm_role_id = 1062507887718567986
 GMDev_id = 1059968168493318198
 GMAdmin_id = 882248427298230292
 
-time_until_next_motm: datetime.today() + relativedelta.relativedelta(months=1)
 
 
 @bot.slash_command(name="motminit", guild_ids=[GUILD], description="Initialize MOTM")
@@ -68,7 +67,7 @@ async def motminit(ctx):
     await ctx.respond("Initializing MOTM")
 
     motm = get_motm()
-
+    time_until_next_motm = datetime.today() + relativedelta.relativedelta(months=1)
     embed = discord.Embed(
         title="Member of the Month",
         color=0xffffff
