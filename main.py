@@ -83,7 +83,7 @@ async def motminit(ctx):
 
     embed.add_field(
         name="Current MotM:",
-        value=f"<@{motm.id}>",
+        value=f"<@{329535398860816385}>",
         inline=True
     )
 
@@ -121,7 +121,7 @@ if not datetime.today().hour:
     async def update_embed():
 
         votingdaysleft()
-        
+
         await ch.purge()
         await ch.send(embed=embed)
 
