@@ -69,7 +69,7 @@ async def motminit(ctx):
 
     motm = get_motm()
 
-    voting_days_left = abs(datetime.today() - ((datetime.today() + (relativedelta.relativedelta(months=1))).replace(day=1, hour= 0, minute= 0, second=1, microsecond= 0)))
+    voting_days_left = (abs(datetime.today() - ((datetime.today() + (relativedelta.relativedelta(months=1))).replace(day=1, hour= 0, minute= 0, second=1, microsecond= 0)))).days
 
 
     embed = discord.Embed(
