@@ -48,9 +48,6 @@ async def gif727(ctx):
     await ctx.respond(random.sample(json.load(open('gifs.json')), 1)[0])
     return    
 
-@bot.slash_command(name="motminit", guild_ids=[GUILD], description="Initialize MOTM")
-@commands.has_any_role(GMDev_id, GMAdmin_id)
-
 ##### QUOTES #####
 
 # gm quote random
@@ -121,7 +118,8 @@ async def motminit(ctx):
 
 @bot.slash_command(name="motmvote", guild_ids=[GUILD], description="Vote for MOTM")    
 async def vote(ctx: discord.ApplicationContext, member: discord.Member):
-    pp = 2
+    return
+    
 
 
 
@@ -130,18 +128,9 @@ if not datetime.today().hour:
     async def update_embed():
 
         votingdaysleft()
-
+        global ch
         await ch.purge()
         await ch.send(embed=embed)
-
-
-
-
-
-
-
-
-
 
 
 
