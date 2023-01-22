@@ -48,6 +48,12 @@ async def gif727(ctx):
     await ctx.respond(random.sample(json.load(open('gifs.json')), 1)[0])
     return    
 
+# JORN GIF
+@bot.slash_command(name="vallas", guild_ids=[GUILD], description='JORN (VALLAS)')
+async def jorngif(ctx):
+    await ctx.respond("https://tenor.com/view/jorn-discord-mod-letterlijk-jorn-gif-27345172")
+    return    
+
 ##### QUOTES #####
 
 # gm quote random
