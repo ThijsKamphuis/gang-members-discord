@@ -77,7 +77,7 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 ##### MOTM #####
 
 # INIT
-@bot.slash_command(name="motminit", guild_ids=[GUILD], description="Initialize MOTM")
+@bot.slash_command(name="motminit", guild_ids=[GUILD], description="Initialize MOTM (ADMIN ONLY)")
 @commands.has_any_role(GMDev_id, GMAdmin_id)
 async def motminit(ctx):
     await ctx.respond("Initializing MOTM")
