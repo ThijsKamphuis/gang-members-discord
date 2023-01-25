@@ -7,6 +7,7 @@ import json
 import random
 from datetime import datetime
 from dateutil import relativedelta
+import requests
 
 # .env
 load_dotenv()
@@ -24,6 +25,13 @@ motm_role_id = 1062507887718567986
 
 GMDev_id = 1059968168493318198
 GMAdmin_id = 882248427298230292
+
+
+
+# GIFS
+tenor_api_key = "AIzaSyCLBIeUiywmo5JIwqImRcRnUMjxwYtXptk"
+client_key = "gang_members_bot"
+search_limit = 50
 
 
 def get_motm() -> discord.Member:
@@ -45,7 +53,15 @@ async def on_ready():
 # 727
 @bot.slash_command(name="727", description='727?')
 async def gif727(ctx):
-    await ctx.respond(random.sample(json.load(open('gifs.json')), 1)[0])
+    r = requests.get("https://tenor.googleapis.com/v2/search?q=%s&key=%s&client_key=%s&limit=%s" % ("727", tenor_api_key, client_key,  search_limit))
+
+    if r.status_code == 200:
+        gifs = json.loads(r.content)
+        await ctx.respond(random.sample(gifs, 1))
+    else:
+        await ctx.respond(r.status_code)
+
+
     return    
 
 # JORN GIF
