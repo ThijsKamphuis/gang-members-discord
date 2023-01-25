@@ -43,13 +43,13 @@ async def on_ready():
 
 
 # 727
-@bot.slash_command(name="727", guild_ids=[GUILD], description='727?')
+@bot.slash_command(name="727", description='727?')
 async def gif727(ctx):
     await ctx.respond(random.sample(json.load(open('gifs.json')), 1)[0])
     return    
 
 # JORN GIF
-@bot.slash_command(name="vallas", guild_ids=[GUILD], description='JORN (VALLAS)')
+@bot.slash_command(name="vallas", description='JORN (VALLAS)')
 async def jorngif(ctx):
     await ctx.respond("https://tenor.com/view/jorn-discord-mod-letterlijk-jorn-gif-27345172")
     return    
@@ -57,13 +57,13 @@ async def jorngif(ctx):
 ##### QUOTES #####
 
 # gm quote random
-@bot.slash_command(name="gmquote", guild_ids=[GUILD], description='Random Gang Member Quote')
+@bot.slash_command(name="gmquote", description='Random Gang Member Quote')
 async def gmquote(ctx):
     gm_quote = random.sample(json.load(open('quotes.json')), 1)[0]
     await ctx.respond(f'> {gm_quote["Quote"]}\n**~{gm_quote["Author"]}, {gm_quote["Year"]}**')
 
 # gm quote add
-@bot.slash_command(name="gmquoteadd", guild_ids=[GUILD], description='Add a Gang Member Quote')
+@bot.slash_command(name="gmquoteadd", description='Add a Gang Member Quote')
 async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, year: int):
     
     quotelist = json.load(open('quotes.json'))
@@ -77,7 +77,7 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 ##### MOTM #####
 
 # INIT
-@bot.slash_command(name="motminit", guild_ids=[GUILD], description="Initialize MOTM (ADMIN ONLY)")
+@bot.slash_command(name="motminit", description="Initialize MOTM (ADMIN ONLY)")
 @commands.has_any_role(GMDev_id, GMAdmin_id)
 async def motminit(ctx):
     await ctx.respond("Initializing MOTM")
@@ -122,7 +122,7 @@ async def motminit(ctx):
     await ch.send(embed=embed)
 
 
-@bot.slash_command(name="motmvote", guild_ids=[GUILD], description="Vote for MOTM")    
+@bot.slash_command(name="motmvote", description="Vote for MOTM")    
 async def vote(ctx: discord.ApplicationContext, member: discord.Member):
     return
     
