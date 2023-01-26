@@ -9,7 +9,7 @@ from datetime import datetime
 from dateutil import relativedelta
 import requests
 
-# .env
+##### .env ####
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('GUILD_ID')
@@ -36,44 +36,53 @@ def votingdaysleft():
     return voting_days_left
 
 
-
+##### STARTUP #####
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="polish moments"))
 
 
-# 727
+
+
+##### 727 #####
 @bot.slash_command(name="727", description='727?')
 async def gif727(ctx):
 
-    await ctx.respond(random.sample(json.load(open('gifs.json')), 1)[0])
+    await ctx.respond(random.sample(json.load(open('databases/gifs.json')), 1)[0])
     return    
 
-# JORN GIF
+##### JORN GIF #####
 @bot.slash_command(name="vallas", description='JORN (VALLAS)')
 async def jorngif(ctx):
     await ctx.respond("https://tenor.com/view/jorn-discord-mod-letterlijk-jorn-gif-27345172")
     return    
 
+
+
+
+
 ##### QUOTES #####
 
-# gm quote random
+# GM QUOTE RANDOM
 @bot.slash_command(name="gmquote", description='Random Gang Member Quote')
 async def gmquote(ctx):
-    gm_quote = random.sample(json.load(open('quotes.json')), 1)[0]
+    gm_quote = random.sample(json.load(open('databases/quotes.json')), 1)[0]
     await ctx.respond(f'> {gm_quote["Quote"]}\n**~{gm_quote["Author"]}, {gm_quote["Year"]}**')
 
-# gm quote add
+# GM QUOTE ADD
 @bot.slash_command(name="gmquoteadd", description='Add a Gang Member Quote')
 async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, year: int):
     
-    quotelist = json.load(open('quotes.json'))
+    quotelist = json.load(open('databases/quotes.json'))
     quotelist.append({"Quote":quote,"Author":author,"Year":year})    
-    with open('quotes.json', 'w') as outfile:
+    with open('databases/quotes.json', 'w') as outfile:
         json.dump(quotelist, outfile, indent=4)
 
     await ctx.respond(f'> {quote}\n**~{author}, {year}**\n Quote successfully added!')
+
+
+
 
 
 ##### MOTM #####
@@ -117,6 +126,7 @@ async def motminit(ctx):
     )
 
     embed.set_footer(text="Use /motmvote @user to vote!")
+
     global ch
     ch = bot.get_channel(motm_channel_id)
     await ch.purge()
@@ -132,7 +142,7 @@ async def vote(ctx: discord.ApplicationContext, member: discord.Member):
 
 
 # Check for new day
-if not datetime.today().hour:
+if datetime.today().hour == 0:
     async def update_embed():
 
         votingdaysleft()
