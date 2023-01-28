@@ -81,14 +81,19 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 
     await ctx.respond(f'> {quote}\n**~{author}, {year}**\n Quote successfully added!')
 
+# GM QUOTE LIST ALL
+@bot.slash_command(name="gmquotelist", description='List all Gang Member Quotes (STAFF ONLY)')
+async def gmquotelist(ctx: discord.ApplicationContext, quote: str, author: str, year: int):
 
+    quote_list = json.load(open('databases/quotes.json'))
+    await ctx.respond(quote_list)
 
 
 
 ##### MOTM #####
 
 # INIT
-@bot.slash_command(name="motminit", description="Initialize MOTM (ADMIN ONLY)")
+@bot.slash_command(name="motminit", description="Initialize MOTM (STAFF ONLY)")
 @commands.has_any_role(GMDev_id, GMAdmin_id)
 async def motminit(ctx):
     await ctx.respond("Initializing MOTM")
