@@ -87,7 +87,7 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 async def gmquotelist(ctx):
 
     quote_list = json.load(open('databases/quotes.json'))
-    await ctx.respond(quote_list)
+    await ctx.respond('\n'.join(quote_list))
 
 
 
