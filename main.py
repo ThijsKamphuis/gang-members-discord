@@ -7,7 +7,7 @@ import json
 import random
 from datetime import datetime
 from dateutil import relativedelta
-import requests
+
 
 ##### .env ####
 load_dotenv()
@@ -24,6 +24,7 @@ motm_channel_id = 1065028419487793182
 motm_role_id = 1062507887718567986
 
 GMDev_id = 1059968168493318198
+GMStaff_id = 1067195296993517568
 GMAdmin_id = 882248427298230292
 
 
@@ -83,11 +84,44 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 
 # GM QUOTE LIST ALL
 @bot.slash_command(name="gmquotelist", description='List all Gang Member Quotes (STAFF ONLY)')
-@commands.has_any_role(GMDev_id, GMAdmin_id)
+@commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
 async def gmquotelist(ctx):
+        
+        quote_list = json.load(open('databases/quotes.json'))
+        
+        quote_embed = discord.Embed(
+            title="Gang Member Quotes",
+            color=0xae8cff
+        )
 
-    quote_list = json.load(open('databases/quotes.json'))
-    await ctx.respond('\n'.join(quote_list))
+        quote_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
+
+
+        for i in quote_list:
+            quote_embed.add_field(
+                name=i["Quote"],
+                value=f'{i["Author"]}, {i["Year"]}',
+                inline=False
+            )
+        bot_zooi = bot.get_channel(882574276765564989)
+        await ctx.respond(embed=quote_embed, ephemeral=True)
+
+@gmquotelist.error
+async def on_application_command_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
+    if isinstance(error, commands.MissingAnyRole):
+        await ctx.respond("You do not have permission to use this command. (STAFF ONLY)", ephemeral=True)
+    else:
+        raise error
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -95,15 +129,13 @@ async def gmquotelist(ctx):
 
 # INIT
 @bot.slash_command(name="motminit", description="Initialize MOTM (STAFF ONLY)")
-@commands.has_any_role(GMDev_id, GMAdmin_id)
+@commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
 async def motminit(ctx):
     await ctx.respond("Initializing MOTM")
 
     motm = get_motm()
 
-    
 
-    global embed
     embed = discord.Embed(
         title="Member of the Month",
         color=0xffffff
@@ -133,7 +165,6 @@ async def motminit(ctx):
 
     embed.set_footer(text="Use /motmvote @user to vote!")
 
-    global ch
     ch = bot.get_channel(motm_channel_id)
     await ch.purge()
 
@@ -144,18 +175,5 @@ async def motminit(ctx):
 async def vote(ctx: discord.ApplicationContext, member: discord.Member):
     return
     
-
-
-
-# Check for new day
-if datetime.today().hour == 0:
-    async def update_embed():
-
-        votingdaysleft()
-        global ch
-        await ch.purge()
-        await ch.send(embed=embed)
-
-
 
 bot.run(TOKEN)
