@@ -110,7 +110,7 @@ async def gmquotelist(ctx):
             inline=False
         )
     
-        await ctx.respond(embed=quote_embed, ephemeral=True)
+    await ctx.respond(embed=quote_embed, ephemeral=True)
     return
 
 
