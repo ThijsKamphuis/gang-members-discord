@@ -104,10 +104,10 @@ async def gmquotelist(ctx):
             value=f'{i["Author"]}, {i["Year"]}',
             inline=False
         )
-        quote_embed.add_field(
-            name="\u200B",
-            inline=False
-        )
+        #quote_embed.add_field(
+            #name="\u200B",
+            #inline=False
+      #  )
     
     
     bot_zooi = bot.get_channel(882574276765564989)
