@@ -44,14 +44,13 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="polish moments"))
 
 
-
-
 ##### 727 #####
 @bot.slash_command(name="727", description='727?')
 async def gif727(ctx):
 
     await ctx.respond(random.sample(json.load(open('databases/gifs.json')), 1)[0])
     return    
+
 
 ##### JORN GIF #####
 @bot.slash_command(name="vallas", description='JORN (VALLAS)')
@@ -71,6 +70,7 @@ async def gmquote(ctx):
     gm_quote = random.sample(json.load(open('databases/quotes.json')), 1)[0]
     await ctx.respond(f'> {gm_quote["Quote"]}\n**~{gm_quote["Author"]}, {gm_quote["Year"]}**')
 
+
 # GM QUOTE ADD
 @bot.slash_command(name="gmquoteadd", description='Add a Gang Member Quote')
 async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, year: int):
@@ -81,6 +81,7 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
         json.dump(quotelist, outfile, indent=4)
 
     await ctx.respond(f'> {quote}\n**~{author}, {year}**\n Quote successfully added!')
+
 
 # GM QUOTE LIST ALL
 @bot.slash_command(name="gmquotelist", description='List all Gang Member Quotes (STAFF ONLY)')
@@ -105,9 +106,13 @@ async def gmquotelist(ctx):
             )
         bot_zooi = bot.get_channel(882574276765564989)
         await ctx.respond(embed=quote_embed, ephemeral=True)
+        await ctx.respond(ctx.channel.id, ephemeral=True)
+
+
+
 
 @gmquotelist.error
-async def on_application_command_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
+async def gmquote_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
     if isinstance(error, commands.MissingAnyRole):
         await ctx.respond("You do not have permission to use this command. (STAFF ONLY)", ephemeral=True)
     else:
@@ -170,7 +175,16 @@ async def motminit(ctx):
 
     await ch.send(embed=embed)
 
+@motminit.error
+async def motminit_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
+    if isinstance(error, commands.MissingAnyRole):
+        await ctx.respond("You do not have permission to use this command. (STAFF ONLY)", ephemeral=True)
+    else:
+        raise error
 
+
+
+# VOTE
 @bot.slash_command(name="motmvote", description="Vote for MOTM")    
 async def vote(ctx: discord.ApplicationContext, member: discord.Member):
     return
