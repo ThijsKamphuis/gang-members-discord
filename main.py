@@ -1,13 +1,16 @@
 import discord
 from discord.ext import commands
+from discord.ext import pages
 from discord.utils import get_or_fetch
+from discord.ui import Button, View
 import os
 from dotenv import load_dotenv
 import json
 import random
 from datetime import datetime
 from dateutil import relativedelta
-
+import math
+import asyncio
 
 ##### .env ####
 load_dotenv()
@@ -64,6 +67,42 @@ async def jorngif(ctx):
 
 ##### QUOTES #####
 
+def get_quote_page(page):
+    quote_list = json.load(open('databases/quotes.json'))
+
+    totalpages = (math.ceil(len(quote_list) / 6))
+    quoteindex = 0 + ((page - 1) * 6)
+
+    global quote_embed
+    if page < totalpages:
+        quote_embed = discord.Embed(
+            title=f"Gang Member Quotes \t Page {page} / {totalpages}",
+            color=0xae8cff
+        )
+        quote_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
+
+        for x in range(quoteindex, (quoteindex + 6)):
+            quote_embed.add_field(
+                name=quote_list[quoteindex]["Quote"],
+                value=f'{quote_list[quoteindex]["Author"]}, {quote_list[quoteindex]["Year"]}\n \u200B',
+                inline=False
+            )
+            quoteindex += 1
+    elif page == totalpages:
+        quote_embed = discord.Embed(
+            title=f"Gang Member Quotes \t Page {page} / {totalpages}",
+            color=0xae8cff
+        )
+        quote_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
+
+        for z in range(quoteindex, len(quote_list)):
+            quote_embed.add_field(
+                name=quote_list[quoteindex]["Quote"],
+                value=f'{quote_list[quoteindex]["Author"]}, {quote_list[quoteindex]["Year"]}\n \u200B',
+                inline=False
+            )
+            quoteindex += 1
+
 # GM QUOTE RANDOM
 @bot.slash_command(name="gmquote", description='Random Gang Member Quote')
 async def gmquote(ctx):
@@ -87,26 +126,20 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 @bot.slash_command(name="gmquotelist", description='List all Gang Member Quotes (STAFF ONLY)')
 @commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
 async def gmquotelist(ctx):
-        
-    quote_list = json.load(open('databases/quotes.json'))
-        
-    quote_embed = discord.Embed(
-        title="Gang Member Quotes",
-        color=0xae8cff
-    )
-
-    quote_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
-
-
-    for i in quote_list:
-        quote_embed.add_field(
-            name=i["Quote"],
-            value=f'{i["Author"]}, {i["Year"]}\n \u200B',
-            inline=False
-        )
     
-    await ctx.respond(embed=quote_embed, ephemeral=True)
-    return
+    get_quote_page(1)
+    await ctx.interaction.response.send_message(embed=quote_embed, ephemeral=True)
+
+    #get_quote_page(2)
+    #await ctx.interaction.edit_original_response(embed=quote_embed)
+
+            
+
+
+
+
+
+
 
 
 
@@ -117,16 +150,6 @@ async def gmquote_error(ctx: discord.ApplicationContext, error: discord.DiscordE
         await ctx.respond("You do not have permission to use this command. (STAFF ONLY)", ephemeral=True)
     else:
         raise error
-
-
-
-
-
-
-
-
-
-
 
 
 
