@@ -144,6 +144,8 @@ async def gmquotelist(ctx):
 
 
 
+
+
 @gmquotelist.error
 async def gmquote_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
     if isinstance(error, commands.MissingAnyRole):
