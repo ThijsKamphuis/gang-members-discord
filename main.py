@@ -88,25 +88,25 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 @commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
 async def gmquotelist(ctx):
         
-        quote_list = json.load(open('databases/quotes.json'))
+    quote_list = json.load(open('databases/quotes.json'))
         
-        quote_embed = discord.Embed(
-            title="Gang Member Quotes",
-            color=0xae8cff
-        )
+    quote_embed = discord.Embed(
+        title="Gang Member Quotes",
+        color=0xae8cff
+    )
 
-        quote_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
+    quote_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
 
 
-        for i in quote_list:
-            quote_embed.add_field(
-                name=i["Quote"],
-                value=f'{i["Author"]}, {i["Year"]}',
-                inline=False
-            )
-        bot_zooi = bot.get_channel(882574276765564989)
-        await ctx.respond(embed=quote_embed, ephemeral=True)
-        await ctx.respond(ctx.channel.id, ephemeral=True)
+    for i in quote_list:
+        quote_embed.add_field(
+            name=i["Quote"],
+            value=f'{i["Author"]}, {i["Year"]}',
+            inline=False
+    )
+    bot_zooi = bot.get_channel(882574276765564989)
+    await ctx.respond(embed=quote_embed)
+    return
 
 
 
