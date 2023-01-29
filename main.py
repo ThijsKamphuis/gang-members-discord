@@ -101,12 +101,7 @@ async def gmquotelist(ctx):
     for i in quote_list:
         quote_embed.add_field(
             name=i["Quote"],
-            value=f'{i["Author"]}, {i["Year"]}\n',
-            inline=False
-        )
-        quote_embed.add_field(
-            name="\u200B",
-            value="\u200B",
+            value=f'{i["Author"]}, {i["Year"]}\n \u200B',
             inline=False
         )
     
