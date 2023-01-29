@@ -106,7 +106,7 @@ async def gmquotelist(ctx):
         )
         quote_embed.add_field(
             name="\u200B",
-            value="\u200B"
+            value="\u200B",
             inline=False
         )
     
