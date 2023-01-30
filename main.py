@@ -51,7 +51,7 @@ async def on_ready():
 @bot.slash_command(name="727", description='727?')
 async def gif727(ctx):
 
-    await ctx.respond(random.sample(json.load(open('databases/gifs.json')), 1)[0])
+    await ctx.respond(random.sample(json.load(open('databases/gifs.json', encoding="utf-8")), 1)[0])
     return    
 
 
@@ -68,7 +68,7 @@ async def jorngif(ctx):
 ##### QUOTES #####
 
 def get_quote_page(page):
-    quote_list = json.load(open('databases/quotes.json'))
+    quote_list = json.load(open('databases/quotes.json', encoding="utf-8"))
 
     totalpages = (math.ceil(len(quote_list) / 6))
     quoteindex = 0 + ((page - 1) * 6)
@@ -106,7 +106,7 @@ def get_quote_page(page):
 # GM QUOTE RANDOM
 @bot.slash_command(name="gmquote", description='Random Gang Member Quote')
 async def gmquote(ctx):
-    gm_quote = random.sample(json.load(open('databases/quotes.json')), 1)[0]
+    gm_quote = random.sample(json.load(open('databases/quotes.json', encoding="utf-8")), 1)[0]
     await ctx.respond(f'> {gm_quote["Quote"]}\n**~{gm_quote["Author"]}, {gm_quote["Year"]}**')
 
 
@@ -114,7 +114,7 @@ async def gmquote(ctx):
 @bot.slash_command(name="gmquoteadd", description='Add a Gang Member Quote')
 async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, year: int):
     
-    quotelist = json.load(open('databases/quotes.json'))
+    quotelist = json.load(open('databases/quotes.json', encoding="utf-8"))
     quotelist.append({"Quote":quote,"Author":author,"Year":year})    
     with open('databases/quotes.json', 'w') as outfile:
         json.dump(quotelist, outfile, indent=4)
