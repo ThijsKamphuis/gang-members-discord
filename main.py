@@ -124,7 +124,8 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 # GM QUOTE LIST ALL
 
 class QuoteButtonsView(discord.ui.View):
-    @discord.ui.button(label="Button", style=discord.ButtonStyle.primary) 
+    @discord.ui.button(label="PREV", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="NEXT", style=discord.ButtonStyle.primary) 
     async def button_callback(self, button, interaction: discord.Interaction):
         await interaction.edit_original_response(content="BUTTON PRESSED")
 
