@@ -213,6 +213,22 @@ async def motminit_error(ctx: discord.ApplicationContext, error: discord.Discord
 @bot.slash_command(name="motmvote", description="Vote for MOTM")    
 async def vote(ctx: discord.ApplicationContext, member: discord.Member):
     return
-    
+
+
+
+
+
+
+
+
+##### BUTTON TEST #####
+
+bot.slash_command(name="buttontest", description="button test command")
+async def buttontest(ctx):
+    testview = discord.ui.View()
+    button = discord.ui.Button(label="Button")
+    testview.add_item(button)
+    await ctx.respond(view=testview)
+
 
 bot.run(TOKEN)
