@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from discord.ext import pages
 from discord.utils import get_or_fetch
-import discord.ui
 import os
 from dotenv import load_dotenv
 import json
@@ -124,11 +123,10 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 
 # GM QUOTE LIST ALL
 
-class QuoteListButtonView(discord.ui.View):
-
-    @discord.ui.button(label="TestButton", style=discord.ButtonStyle.success)
-    async def testbutton(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message("Button Pressed")
+class QuoteButtonsView(discord.ui.View):
+    @discord.ui.button(label="Button", style=discord.ButtonStyle.primary) 
+    async def button_callback(self, button, interaction):
+        await interaction.response.send_message("PP")
 
 
 
@@ -138,9 +136,14 @@ class QuoteListButtonView(discord.ui.View):
 @bot.slash_command(name="gmquotelist", description='List all Gang Member Quotes (STAFF ONLY)')
 @commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
 async def gmquotelist(ctx):
+
+    await ctx.respond(view = QuoteButtonsView(), ephemeral=True)
+
+
+
     
-    get_quote_page(1)
-    await ctx.interaction.response.send_message(embed=quote_embed, ephemeral=True)
+    #get_quote_page(1)
+    #wait ctx.interaction.response.send_message(embed=quote_embed, ephemeral=True)
 
     #get_quote_page(2)
     #await ctx.interaction.edit_original_response(embed=quote_embed)
@@ -221,20 +224,6 @@ async def motminit_error(ctx: discord.ApplicationContext, error: discord.Discord
     
 
 
-
-
-
-
-
-
-##### BUTTON TEST #####
-
-@bot.slash_command(name="buttontest", description="test button")    
-async def testbutton(ctx):
-    testview = QuoteListButtonView()
-    button = discord.ui.Button(label="button")
-    testview.add_item(button)
-    await ctx.respond(view=testview, ephemeral=True)
 
 
 bot.run(TOKEN)
