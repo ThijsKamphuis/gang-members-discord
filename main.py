@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext import pages
 from discord.utils import get_or_fetch
-from discord.ui import Button, View
+import discord.ui
 import os
 from dotenv import load_dotenv
 import json
@@ -123,6 +123,18 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 
 
 # GM QUOTE LIST ALL
+
+class QuoteListButtonView(discord.ui.View):
+
+    @discord.ui.button(label="TestButton", style=discord.ButtonStyle.success)
+    async def testbutton(self, interaction: discord.Interaction, button: Button):
+        await interaction.response.send_message("Button Pressed")
+
+
+
+
+
+
 @bot.slash_command(name="gmquotelist", description='List all Gang Member Quotes (STAFF ONLY)')
 @commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
 async def gmquotelist(ctx):
@@ -219,11 +231,10 @@ async def motminit_error(ctx: discord.ApplicationContext, error: discord.Discord
 
 @bot.slash_command(name="buttontest", description="test button")    
 async def testbutton(ctx):
-    testview = View()
-    button = Button(label="button")
+    testview = QuoteListButtonView()
+    button = discord.ui.Button(label="button")
     testview.add_item(button)
-    await ctx.respond(view=testview)
-
+    await ctx.respond(view=testview, ephemeral=True)
 
 
 bot.run(TOKEN)
