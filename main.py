@@ -223,12 +223,13 @@ async def vote(ctx: discord.ApplicationContext, member: discord.Member):
 
 ##### BUTTON TEST #####
 
-@bot.slash_command(name="buttontest", description="button test command")
-async def buttontest(ctx):
-    testview = discord.ui.View()
+@bot.slash_command(name="buttontest", description="buttons")    
+async def buttontest(ctx: discord.ApplicationContext):
+    view = discord.ui.View()
     button = discord.ui.Button(label="Button")
-    testview.add_item(button)
-    await ctx.respond(view=testview)
+    view.add_item(button)
+    await ctx.respond(view = view)
+    return
 
 
 bot.run(TOKEN)
