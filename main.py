@@ -126,7 +126,7 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 class QuoteButtonsView(discord.ui.View):
     @discord.ui.button(label="Button", style=discord.ButtonStyle.primary) 
     async def button_callback(self, button, interaction):
-        await interaction.response.send_message("PP")
+        await interaction.response.send_message("PP", ephemeral=True)
 
 
 
