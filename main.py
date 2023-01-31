@@ -127,7 +127,7 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 class QuoteListButtonView(discord.ui.View):
 
     @discord.ui.button(label="TestButton", style=discord.ButtonStyle.success)
-    async def testbutton(self, interaction: discord.Interaction, button: Button):
+    async def testbutton(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_message("Button Pressed")
 
 
