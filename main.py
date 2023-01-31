@@ -219,8 +219,10 @@ async def motminit_error(ctx: discord.ApplicationContext, error: discord.Discord
 
 @bot.slash_command(name="buttontest", description="test button")    
 async def testbutton(ctx):
-    await ctx.respond("pp")
-
+    testview = View()
+    button = Button(label="button")
+    testview.add_item(button)
+    await ctx.respond(view=testview)
 
 
 
