@@ -206,13 +206,7 @@ async def motminit_error(ctx: discord.ApplicationContext, error: discord.Discord
         await ctx.respond("You do not have permission to use this command. (STAFF ONLY)", ephemeral=True)
     else:
         raise error
-
-
-
-# VOTE
-@bot.slash_command(name="motmvote", description="Vote for MOTM")    
-async def vote(ctx: discord.ApplicationContext, member: discord.Member):
-    return
+    
 
 
 
@@ -223,13 +217,16 @@ async def vote(ctx: discord.ApplicationContext, member: discord.Member):
 
 ##### BUTTON TEST #####
 
-@bot.slash_command(name="buttontest", description="buttons")    
-async def buttontest(ctx: discord.ApplicationContext):
+
+# VOTE
+@bot.slash_command(name="buttontest", description="test button")    
+async def testbutton(ctx: discord.ApplicationContext, member: discord.Member):
     view = discord.ui.View()
     button = discord.ui.Button(label="Button")
     view.add_item(button)
     await ctx.respond(view = view)
-    return
+
+
 
 
 bot.run(TOKEN)
