@@ -183,15 +183,15 @@ async def motminit(ctx):
         inline=True
     )
 
-    users = ["user1", "user2", "user3"]
+    #users = ["user1", "user2", "user3"]
 
-    standings_list = "\n".join([f"{i}. {user}: 5" for i, user in enumerate(users, start=1)])
+    #standings_list = "\n".join([f"{i}. {user}: 5" for i, user in enumerate(users, start=1)])
 
-    embed.add_field(
-        name="Current Standings",
-        value=standings_list,
-        inline=False
-    )
+    #embed.add_field(
+        #name="Current Standings",
+        #value=standings_list,
+        #inline=False
+    #)
 
     embed.set_footer(text="Use /motmvote @user to vote!")
 
