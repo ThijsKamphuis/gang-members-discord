@@ -129,6 +129,12 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 # GM QUOTE LIST ALL
 
 class QuoteButtonsView(discord.ui.View):
+    @discord.ui.button(label="Prev", style=discord.ButtonStyle.primary, emoji="⬅")
+    async def prev(self, button: discord.ui.Button, interaction: discord.Interaction):
+        if current_page > 1:
+            get_quote_page((current_page - 1))
+            await interaction.edit_original_response(embed = quote_embed)
+            
     @discord.ui.button(label="Next", style=discord.ButtonStyle.primary, emoji="➡")
     async def next(self, button: discord.ui.Button, interaction: discord.Interaction):
         if current_page < total_pages:
@@ -136,11 +142,7 @@ class QuoteButtonsView(discord.ui.View):
 
             await interaction.edit_original_response(embed = quote_embed)
 
-    @discord.ui.button(label="Prev", style=discord.ButtonStyle.primary, emoji="⬅")
-    async def prev(self, button: discord.ui.Button, interaction: discord.Interaction):
-        if current_page > 1:
-            get_quote_page((current_page - 1))
-            await interaction.edit_original_response(embed = quote_embed)
+
 
 
 
