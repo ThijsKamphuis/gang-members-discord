@@ -162,32 +162,18 @@ async def gmquotelist(ctx):
 
 
 
-    
-    #get_quote_page(1)
-    #await ctx.interaction.response.send_message(embed=quote_embed, ephemeral=True)
-
-    #get_quote_page(2)
-    #await ctx.interaction.edit_original_response(embed=quote_embed)
-
-            
-
-
-
-
-
-
-
-
-
-
-
-
 @gmquotelist.error
 async def gmquote_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
     if isinstance(error, commands.MissingAnyRole):
         await ctx.respond("You do not have permission to use this command. (STAFF ONLY)", ephemeral=True)
     else:
         raise error
+
+
+
+
+
+
 
 
 
@@ -206,6 +192,8 @@ async def motminit(ctx):
         title="Member of the Month",
         color=0xffffff
     )
+    
+    embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
 
     embed.add_field(
         name="Current MotM:",
