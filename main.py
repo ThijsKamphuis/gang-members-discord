@@ -135,8 +135,7 @@ class QuoteButtonsView(discord.ui.View):
             get_quote_page((current_page - 1))
             await interaction.response.edit_message(embed = quote_embed)
         else:
-            get_quote_page(current_page)
-            await interaction.response.edit_message(embed = quote_embed)
+            return
 
     @discord.ui.button(label="Next", style=discord.ButtonStyle.primary, emoji="➡")
     async def next(self, button: discord.ui.Button, interaction: discord.Interaction):
@@ -144,8 +143,7 @@ class QuoteButtonsView(discord.ui.View):
             get_quote_page((current_page + 1))
             await interaction.response.edit_message(embed = quote_embed)
         else:
-            get_quote_page(current_page)
-            await interaction.response.edit_message(embed = quote_embed)
+            return
 
 
 
