@@ -65,12 +65,17 @@ async def jorngif(ctx):
 
 
 ##### QUOTES #####
-
 def get_quote_page(page):
     quote_list = json.load(open('databases/quotes.json', encoding="utf-8"))
 
     totalpages = (math.ceil(len(quote_list) / 6))
     quoteindex = 0 + ((page - 1) * 6)
+
+    global current_page, total_pages
+    current_page = page
+    total_pages = totalpages
+
+
 
     global quote_embed
     if page < totalpages:
@@ -124,12 +129,18 @@ async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, y
 # GM QUOTE LIST ALL
 
 class QuoteButtonsView(discord.ui.View):
-    @discord.ui.button(label="PREV", style=discord.ButtonStyle.primary)
-    @discord.ui.button(label="NEXT", style=discord.ButtonStyle.primary) 
-    async def button_callback(self, button, interaction: discord.Interaction):
-        await interaction.edit_original_response(content="BUTTON PRESSED")
+    @discord.ui.button(label="Next", style=discord.ButtonStyle.primary, emoji="➡")
+    async def next(self, button: discord.ui.Button, interaction: discord.Interaction):
+        if current_page < total_pages:
+            get_quote_page((current_page + 1))
 
+            await interaction.edit_original_response(embed = quote_embed)
 
+    @discord.ui.button(label="Prev", style=discord.ButtonStyle.primary, emoji="⬅")
+    async def prev(self, button: discord.ui.Button, interaction: discord.Interaction):
+        if current_page > 1:
+            get_quote_page((current_page - 1))
+            await interaction.edit_original_response(embed = quote_embed)
 
 
 
@@ -138,13 +149,14 @@ class QuoteButtonsView(discord.ui.View):
 @commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
 async def gmquotelist(ctx):
 
-    await ctx.respond(view = QuoteButtonsView(), ephemeral=True)
+    get_quote_page(1)
+    await ctx.respond(embed = quote_embed, view = QuoteButtonsView(), ephemeral=True)
 
 
 
     
     #get_quote_page(1)
-    #wait ctx.interaction.response.send_message(embed=quote_embed, ephemeral=True)
+    #await ctx.interaction.response.send_message(embed=quote_embed, ephemeral=True)
 
     #get_quote_page(2)
     #await ctx.interaction.edit_original_response(embed=quote_embed)
