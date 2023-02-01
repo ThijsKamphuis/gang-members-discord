@@ -60,7 +60,11 @@ async def jorngif(ctx):
     await ctx.respond("https://tenor.com/view/jorn-discord-mod-letterlijk-jorn-gif-27345172")
     return    
 
-
+##### MANOE GIF #####
+@bot.slash_command(name="manoe", description='MANOE')
+async def manoegif(ctx):
+    await ctx.respond("https://tenor.com/view/manoe-gangmembers-gm-gif-27494707")
+    return  
 
 
 
