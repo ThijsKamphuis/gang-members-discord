@@ -135,16 +135,17 @@ class QuoteButtonsView(discord.ui.View):
             get_quote_page((current_page - 1))
             await interaction.response.edit_message(embed = quote_embed)
         else:
-            return
+            get_quote_page(current_page)
+            await interaction.response.edit_message(embed = quote_embed)
 
     @discord.ui.button(label="Next", style=discord.ButtonStyle.primary, emoji="➡")
     async def next(self, button: discord.ui.Button, interaction: discord.Interaction):
         if current_page < total_pages:
             get_quote_page((current_page + 1))
-
             await interaction.response.edit_message(embed = quote_embed)
         else:
-            return
+            get_quote_page(current_page)
+            await interaction.response.edit_message(embed = quote_embed)
 
 
 
