@@ -190,7 +190,7 @@ async def motminit(ctx):
 
     embed = discord.Embed(
         title="Member of the Month",
-        color=0xffffff
+        color=motm.color
     )
 
     embed.set_thumbnail(url=motm.display_avatar.url)
