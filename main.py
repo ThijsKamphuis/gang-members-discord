@@ -9,7 +9,7 @@ import random
 from datetime import datetime
 from dateutil import relativedelta
 import math
-import asyncio
+import schedule
 
 ##### .env ####
 load_dotenv()
@@ -45,6 +45,8 @@ async def on_ready():
     print(f'We have logged in as {bot.user}')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="polish moments"))
 
+    motm_db = json.load(open('databases/motm.json', encoding="utf-8"))
+    print(motm_db)
 
 ##### 727 #####
 @bot.slash_command(name="727", description='727?')
@@ -179,50 +181,54 @@ async def gmquote_error(ctx: discord.ApplicationContext, error: discord.DiscordE
 
 ##### MOTM #####
 
-# INIT
-@bot.slash_command(name="motminit", description="Initialize MOTM (STAFF ONLY)")
-@commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
-async def motminit(ctx):
-    await ctx.respond("Initializing MOTM")
-
+# Generate embed every day at midnight
+@schedule.repeat(schedule.every().day.at("00:00"))
+# Generate embed with most recent data
+def motm_embed_gen():
     motm = get_motm()
-
-
-    embed = discord.Embed(
+    global motm_embed
+    motm_embed = discord.Embed(
         title="Member of the Month",
         color=motm.color
     )
 
-    embed.set_thumbnail(url=motm.display_avatar.url)
-    motm.
-    embed.add_field(
+    motm_embed.set_thumbnail(url=motm.display_avatar.url)
+    
+    motm_embed.add_field(
         name="Current MotM:",
         value=f"<@{motm.id}>",
         inline=True
     )
 
-    embed.add_field(
+    motm_embed.add_field(
         name="Days left to vote:",
         value=str(votingdaysleft()),
         inline=True
     )
 
-    #users = ["user1", "user2", "user3"]
 
-    #standings_list = "\n".join([f"{i}. {user}: 5" for i, user in enumerate(users, start=1)])
+    motm_embed.set_footer(text="Use /motmvote @user to vote!")
 
-    #embed.add_field(
-        #name="Current Standings",
-        #value=standings_list,
-        #inline=False
-    #)
 
-    embed.set_footer(text="Use /motmvote @user to vote!")
+schedule.run_pending()
+
+
+# INIT
+# Generate embed
+# Send message
+# save ID in JSON
+@bot.slash_command(name="motminit", description="Initialize MOTM (STAFF ONLY)")
+@commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
+async def motminit(ctx):
+    await ctx.respond("Initializing MOTM", ephemeral=True)
+
+    motm_embed_gen()
 
     ch = bot.get_channel(motm_channel_id)
-    await ch.purge()
+    motm_message = await ch.send(embed= motm_embed)
+    
+    motm_db = json.load(open('databases/motm.json', encoding="utf-8"))
 
-    await ch.send(embed=embed)
 
 @motminit.error
 async def motminit_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
