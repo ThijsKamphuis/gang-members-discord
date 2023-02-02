@@ -192,8 +192,8 @@ async def motminit(ctx):
         title="Member of the Month",
         color=0xffffff
     )
-    
-    embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
+
+    embed.set_thumbnail(url=motm.display_avatar.url)
 
     embed.add_field(
         name="Current MotM:",
