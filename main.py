@@ -194,7 +194,7 @@ async def motminit(ctx):
     )
 
     embed.set_thumbnail(url=motm.display_avatar.url)
-
+    motm.
     embed.add_field(
         name="Current MotM:",
         value=f"<@{motm.id}>",
