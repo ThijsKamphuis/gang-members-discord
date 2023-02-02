@@ -1,8 +1,5 @@
-{
-    "MOTM_Message": [
-        {
-            "ID":"Test",
-            "DaysLeft":"0"
-        }
-    ]
-}
+[
+    {
+        "MOTM_Message_ID": 1070833292187807754
+    }
+]

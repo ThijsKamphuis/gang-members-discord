@@ -10,6 +10,7 @@ from datetime import datetime
 from dateutil import relativedelta
 import math
 import schedule
+import asyncio
 
 ##### .env ####
 load_dotenv()
@@ -45,9 +46,7 @@ async def on_ready():
     print(f'We have logged in as {bot.user}')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="polish moments"))
 
-    motm_db = json.load(open('databases/motm.json', encoding="utf-8"))
-    print(motm_db)
-
+    
 ##### 727 #####
 @bot.slash_command(name="727", description='727?')
 async def gif727(ctx):
@@ -155,21 +154,13 @@ class QuoteButtonsView(discord.ui.View):
 
 
 
-@bot.slash_command(name="gmquotelist", description='List all Gang Member Quotes (STAFF ONLY)')
-@commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
+@bot.slash_command(name="gmquotelist", description='List all Gang Member Quotes')
 async def gmquotelist(ctx):
 
     get_quote_page(1)
     await ctx.respond(embed = quote_embed, view = QuoteButtonsView(), ephemeral=True)
 
 
-
-@gmquotelist.error
-async def gmquote_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
-    if isinstance(error, commands.MissingAnyRole):
-        await ctx.respond("You do not have permission to use this command. (STAFF ONLY)", ephemeral=True)
-    else:
-        raise error
 
 
 
@@ -181,8 +172,6 @@ async def gmquote_error(ctx: discord.ApplicationContext, error: discord.DiscordE
 
 ##### MOTM #####
 
-# Generate embed every day at midnight
-@schedule.repeat(schedule.every().day.at("00:00"))
 # Generate embed with most recent data
 def motm_embed_gen():
     motm = get_motm()
@@ -209,9 +198,22 @@ def motm_embed_gen():
 
     motm_embed.set_footer(text="Use /motmvote @user to vote!")
 
+async def edit_embed():
+    
+    # Generate embed
+    motm_embed_gen()
+    
+    # Fetch message ID
+    motm_db = json.load(open('databases/motm.json', encoding="utf-8"))
+    motm_db_ID = motm_db[0]["MOTM_Message_ID"]
+    
+    # Edit message
+    ch = bot.get_channel(motm_channel_id)  
+    msg = await ch.fetch_message(motm_db_ID)
+    await msg.edit(embed= motm_embed)
+    return
 
-schedule.run_pending()
-
+    
 
 # INIT
 # Generate embed
@@ -221,14 +223,19 @@ schedule.run_pending()
 @commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
 async def motminit(ctx):
     await ctx.respond("Initializing MOTM", ephemeral=True)
+    # Generate embed
+    motm_embed_gen() 
 
-    motm_embed_gen()
-
+    # Send message
     ch = bot.get_channel(motm_channel_id)
     motm_message = await ch.send(embed= motm_embed)
     
+    #save ID in JSON
     motm_db = json.load(open('databases/motm.json', encoding="utf-8"))
-
+    motm_db[0]["MOTM_Message_ID"] = motm_message.id
+    with open('databases/motm.json', 'w') as outfile:
+        json.dump(motm_db, outfile, indent=4)
+    
 
 @motminit.error
 async def motminit_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
@@ -237,8 +244,19 @@ async def motminit_error(ctx: discord.ApplicationContext, error: discord.Discord
     else:
         raise error
     
+@bot.slash_command(name="motmdel", description="Purge MOTM channel(DEV ONLY)")
+@commands.has_any_role(GMDev_id)
+async def motmdel(ctx):
 
+    ch = bot.get_channel(motm_channel_id)
+    await ch.purge()
+    await ctx.respond("Purging", ephemeral=True)
 
-
-
+@bot.slash_command(name="motmrefresh", description="Refresh MOTM embed(DEV ONLY)")
+@commands.has_any_role(GMDev_id)
+async def motmedit(ctx):
+    await edit_embed()
+    await ctx.respond("refreshing embed", ephemeral=True)
+    
+    
 bot.run(TOKEN)
