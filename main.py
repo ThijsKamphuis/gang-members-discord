@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from discord.ext import pages
+from discord.ext import tasks
 from discord.utils import get_or_fetch
 import os
 from dotenv import load_dotenv
@@ -45,7 +45,7 @@ def votingdaysleft():
 async def on_ready():
     print(f'We have logged in as {bot.user}')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="polish moments"))
-
+    refresh_MOTM.start()
     
 ##### 727 #####
 @bot.slash_command(name="727", description='727?')
@@ -213,12 +213,11 @@ async def edit_embed():
     await msg.edit(embed= motm_embed)
     return
 
-    
-
 # INIT
 # Generate embed
 # Send message
 # save ID in JSON
+# set Active True in JSON
 @bot.slash_command(name="motminit", description="Initialize MOTM (STAFF ONLY)")
 @commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
 async def motminit(ctx):
@@ -228,6 +227,7 @@ async def motminit(ctx):
 
     # Send message
     ch = bot.get_channel(motm_channel_id)
+    await ch.purge()
     motm_message = await ch.send(embed= motm_embed)
     
     #save ID in JSON
@@ -252,11 +252,11 @@ async def motmdel(ctx):
     await ch.purge()
     await ctx.respond("Purging", ephemeral=True)
 
-@bot.slash_command(name="motmrefresh", description="Refresh MOTM embed(DEV ONLY)")
-@commands.has_any_role(GMDev_id)
-async def motmedit(ctx):
+
+
+@tasks.loop(hours=1.0)
+async def refresh_MOTM():
     await edit_embed()
-    await ctx.respond("refreshing embed", ephemeral=True)
     
     
 bot.run(TOKEN)
