@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord.ext import tasks
-from discord.utils import get_or_fetch
+import discord.utils
 import os
 from dotenv import load_dotenv
 import json
@@ -9,8 +9,8 @@ import random
 from datetime import datetime
 from dateutil import relativedelta
 import math
-import schedule
-import asyncio
+from collections import defaultdict
+from re import sub
 
 ##### .env ####
 load_dotenv()
@@ -29,11 +29,13 @@ motm_role_id = 1062507887718567986
 GMDev_id = 1059968168493318198
 GMStaff_id = 1067195296993517568
 GMAdmin_id = 882248427298230292
+GM_id = 882248832354750524
 
 
 def get_motm() -> discord.Member:
     motm = bot.get_guild(gm_guild_id).get_role(motm_role_id).members[0]
     return motm
+
 
 def votingdaysleft():
     voting_days_left = (abs(datetime.today() - ((datetime.today() + (relativedelta.relativedelta(months=1))).replace(day=1, hour= 0, minute= 0, second=1, microsecond= 0)))).days
@@ -151,9 +153,6 @@ class QuoteButtonsView(discord.ui.View):
             await interaction.response.edit_message(embed = quote_embed)
 
 
-
-
-
 @bot.slash_command(name="gmquotelist", description='List all Gang Member Quotes')
 async def gmquotelist(ctx):
 
@@ -164,13 +163,22 @@ async def gmquotelist(ctx):
 
 
 
-
-
-
-
-
-
 ##### MOTM #####
+
+# Count votes
+def count_votes():
+    global vote_standings
+    motm_votes_db = json.load(open('databases/motm_votes.json', encoding="utf-8"))
+    vote_standings = defaultdict(int)
+    for i in motm_votes_db:
+        if i in motm_votes_db:
+            vote_standings[i["Vote"]] += 1
+        else:
+            vote_standings[i["Vote"]] = 1
+            
+    vote_standings = sorted(vote_standings.items(), key=lambda item: item[1], reverse=True)
+    return vote_standings
+    
 
 # Generate embed with most recent data
 def motm_embed_gen():
@@ -194,7 +202,16 @@ def motm_embed_gen():
         value=str(votingdaysleft()),
         inline=True
     )
+    count_votes()
+    
+    standings_list = "\n".join([f"{i}. <@{user[0]}>: **{user[1]}**" for i, user in enumerate(vote_standings, start=1)])
+    
 
+    motm_embed.add_field(
+        name="Standings:",
+        value=standings_list,
+        inline=False
+    )
 
     motm_embed.set_footer(text="Use /motmvote @user to vote!")
 
@@ -217,20 +234,16 @@ async def edit_embed():
 # Generate embed
 # Send message
 # save ID in JSON
-# set Active True in JSON
 @bot.slash_command(name="motminit", description="Initialize MOTM (STAFF ONLY)")
 @commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
 async def motminit(ctx):
     await ctx.respond("Initializing MOTM", ephemeral=True)
-    # Generate embed
     motm_embed_gen() 
 
-    # Send message
     ch = bot.get_channel(motm_channel_id)
     await ch.purge()
     motm_message = await ch.send(embed= motm_embed)
     
-    #save ID in JSON
     motm_db = json.load(open('databases/motm.json', encoding="utf-8"))
     motm_db[0]["MOTM_Message_ID"] = motm_message.id
     with open('databases/motm.json', 'w') as outfile:
@@ -243,20 +256,66 @@ async def motminit_error(ctx: discord.ApplicationContext, error: discord.Discord
         await ctx.respond("You do not have permission to use this command. (STAFF ONLY)", ephemeral=True)
     else:
         raise error
-    
-@bot.slash_command(name="motmdel", description="Purge MOTM channel(DEV ONLY)")
+
+# Delete embed
+@bot.slash_command(name="motmdel", description="Purge MOTM channel (DEV ONLY)")
 @commands.has_any_role(GMDev_id)
 async def motmdel(ctx):
 
     ch = bot.get_channel(motm_channel_id)
-    await ch.purge()
-    await ctx.respond("Purging", ephemeral=True)
 
+    await ctx.respond("Purging", ephemeral=True)
+    await ch.purge()
+    
+    motm_db = json.load(open('databases/motm.json', encoding="utf-8"))
+    motm_db[0]["MOTM_Message_ID"] = "0"
+    with open('databases/motm.json', 'w') as outfile:
+        json.dump(motm_db, outfile, indent=4)
 
 
 @tasks.loop(hours=1.0)
 async def refresh_MOTM():
     await edit_embed()
+ 
+# Vote  
+@bot.slash_command(name="motmvote", description="Vote for MOTM (GM ONLY)")
+@commands.has_any_role(GM_id)
+async def motmvote(ctx: discord.ApplicationContext, user: str):
+    voter = sub("[<,>,@]", "", str(ctx.author.id))
+    user = sub("[<,>,@]", "", str(user))
     
+    GM_role = discord.utils.get(ctx.guild.roles, id=GM_id)
+    user_model = bot.get_guild(gm_guild_id).get_member(int(user))
+    
+    if GM_role in user_model.roles:
+        
+        motm_votes_db = json.load(open('databases/motm_votes.json', encoding="utf-8"))
+        if not any(d["User"] == voter for d in motm_votes_db):
+            motm_votes_db.append({"Vote":user,"User":voter})
+            with open('databases/motm_votes.json', 'w') as outfile:
+                json.dump(motm_votes_db, outfile, indent=4)
+
+            await ctx.respond(f"You voted for <@{user}>.", ephemeral=True)
+        else:
+            await ctx.respond("You already voted", ephemeral=True)
+    else:
+        await ctx.respond("Chosen user is not a Gang Member", ephemeral=True)
+    
+    await refresh_MOTM()
+    
+@motmvote.error
+async def motmvote_role_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
+    if isinstance(error, commands.MissingAnyRole):
+        await ctx.respond("You do not have permission to use this command. (GM ONLY)", ephemeral=True)
+    else:
+        raise error   
+  
+@motmvote.error   
+async def motm_value_error(ctx: discord.ApplicationContext, error: discord.errors.ApplicationCommandInvokeError):
+    if isinstance(error, discord.errors.ApplicationCommandInvokeError):
+        await ctx.respond("Invalid input, mention a user", ephemeral=True)
+    else:
+        raise error  
+
     
 bot.run(TOKEN)
