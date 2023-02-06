@@ -285,22 +285,23 @@ async def motmvote(ctx: discord.ApplicationContext, user: str):
     user = sub("[<,>,@]", "", str(user))
     
     GM_role = discord.utils.get(ctx.guild.roles, id=GM_id)
-    GMadmnin_role = discord.utils.get(ctx.guild.roles, id=GMAdmin_id)
+    GMadmin_role = discord.utils.get(ctx.guild.roles, id=GMAdmin_id)
     user_model = bot.get_guild(gm_guild_id).get_member(int(user))
     
-    if (GM_role in user_model.roles) and (not GMadmnin_role in user_model._roles):
-        
-        motm_votes_db = json.load(open('databases/motm_votes.json', encoding="utf-8"))
-        if not any(d["User"] == voter for d in motm_votes_db):
-            motm_votes_db.append({"Vote":user,"User":voter})
-            with open('databases/motm_votes.json', 'w') as outfile:
-                json.dump(motm_votes_db, outfile, indent=4)
-
-            await ctx.respond(f"You voted for <@{user}>.", ephemeral=True)
+    if (GM_role in user_model.roles):
+        if (GMadmin_role in user_model.roles):
+            await ctx.respond("Chosen user is an Admin", ephemeral=True)
         else:
-            await ctx.respond("You already voted", ephemeral=True)
-    elif GMadmnin_role in user_model.roles:
-        await ctx.respond("Chosen user is an Admin", ephemeral=True)
+            motm_votes_db = json.load(open('databases/motm_votes.json', encoding="utf-8"))
+            if not any(d["User"] == voter for d in motm_votes_db):
+                motm_votes_db.append({"Vote":user,"User":voter})
+                with open('databases/motm_votes.json', 'w') as outfile:
+                    json.dump(motm_votes_db, outfile, indent=4)
+
+                await ctx.respond(f"You voted for <@{user}>.", ephemeral=True)
+            else:
+                await ctx.respond("You already voted", ephemeral=True)
+
     else:
         await ctx.respond("Chosen user is not a GangMember", ephemeral=True)
     
