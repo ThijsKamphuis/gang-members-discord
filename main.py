@@ -1,3 +1,6 @@
+from cgitb import reset
+from ssl import cert_time_to_seconds
+from time import time, timezone
 import discord
 from discord.ext import commands
 from discord.ext import tasks
@@ -6,11 +9,12 @@ import os
 from dotenv import load_dotenv
 import json
 import random
-from datetime import datetime
+from datetime import datetime, timezone, tzinfo
 from dateutil import relativedelta
 import math
 from collections import defaultdict
 from re import sub
+import asyncio
 
 ##### .env ####
 load_dotenv()
@@ -48,6 +52,7 @@ async def on_ready():
     print(f'We have logged in as {bot.user}')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="polish moments"))
     refresh_MOTM.start()
+    check_for_month.start()
     
 ##### 727 #####
 @bot.slash_command(name="727", description='727?')
@@ -318,8 +323,34 @@ async def motmvote_role_error(ctx: discord.ApplicationContext, error: discord.Di
 async def motm_value_error(ctx: discord.ApplicationContext, error: discord.errors.ApplicationCommandInvokeError):
     if isinstance(error, discord.errors.ApplicationCommandInvokeError):
         await ctx.respond("Invalid input, mention a user", ephemeral=True)
-    else:
-        raise error  
 
+
+# Results
+
+def reset_voting():
+    # Generate archive name (prev month)
+    archive_file_name = f"votes_{(datetime.now().month) - 1}_{datetime.now().year}"
     
+    # Copy votes to archive
+    open(f"archive/{archive_file_name}.json", "w").write(open("databases/motm_votes.json").read())
+    
+    # Empty votes
+    with open('databases/motm_votes.json', 'w') as outfile:
+        json.dump([], outfile, indent=4)
+    
+
+def edit_motm():
+    #remove motm role from current motm
+    #give role to next motm
+    print()
+    
+
+@tasks.loop(minutes=1)
+async def check_for_month():
+    if datetime.now().day == 1:
+        reset_voting()
+        edit_motm()
+        asyncio.run(refresh_MOTM())
+    
+
 bot.run(TOKEN)
