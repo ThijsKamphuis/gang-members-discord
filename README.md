@@ -2,10 +2,8 @@
 
 OFFICIAL GANG MEMBERS DISCORD BOT
 =====================================
-Join the community:
-[Gang Members Discord](https://discord.gg/KDcSBqXefC) <br>
-Or check our website:
-[gangmembers.eu](gangmembers.eu)
+[![GANG MEMBERS DISCORD](https://img.shields.io/badge/GANG_MEMBERS_DISCORD-5865F2?style=for-the-badge)](https://dc.gangmembers.eu)
+[![GANGMEMBERS.EU](https://img.shields.io/badge/GANGMEMBERS.EU-ae8cff?style=for-the-badge)](https://gangmembers.eu)
 
 ABOUT THE BOT
 =============
