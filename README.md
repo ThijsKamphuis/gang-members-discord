@@ -2,8 +2,8 @@
 
 OFFICIAL GANG MEMBERS DISCORD BOT
 =====================================
-[![GANG MEMBERS DISCORD](https://img.shields.io/badge/GANG_MEMBERS_DISCORD-5865F2?style=for-the-badge)](https://dc.gangmembers.eu)
-[![GANGMEMBERS.EU](https://img.shields.io/badge/GANGMEMBERS.EU-ae8cff?style=for-the-badge)](https://gangmembers.eu)
+[![GANG MEMBERS DISCORD](https://img.shields.io/badge/GANG_MEMBERS_DISCORD-5865F2?style=for-the-badge)](http://dc.gangmembers.eu)
+[![GANGMEMBERS.EU](https://img.shields.io/badge/GANGMEMBERS.EU-ae8cff?style=for-the-badge)](http://gangmembers.eu)
 
 ABOUT THE BOT
 =============
