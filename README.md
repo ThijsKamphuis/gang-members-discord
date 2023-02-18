@@ -1,5 +1,3 @@
-![Discord Shield](https://discordapp.com/api/guilds/882248303822123018/widget.png?style=shield)
-
 OFFICIAL GANG MEMBERS DISCORD BOT
 =====================================
 [![GANG MEMBERS DISCORD](https://img.shields.io/badge/GANG_MEMBERS_DISCORD-5865F2?style=for-the-badge)](http://dc.gangmembers.eu)
