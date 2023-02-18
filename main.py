@@ -15,6 +15,7 @@ import math
 from collections import defaultdict
 from re import sub
 import asyncio
+from num2words import num2words
 
 ##### .env ####
 load_dotenv()
@@ -60,7 +61,6 @@ async def gif727(ctx):
 
     await ctx.respond(random.sample(json.load(open('databases/gifs.json', encoding="utf-8")), 1)[0])
     return    
-
 
 ##### JORN GIF #####
 @bot.slash_command(name="vallas", description='JORN (VALLAS)')
@@ -236,9 +236,6 @@ async def edit_embed():
     return
 
 # INIT
-# Generate embed
-# Send message
-# save ID in JSON
 @bot.slash_command(name="motminit", description="Initialize MOTM (STAFF ONLY)")
 @commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
 async def motminit(ctx):
@@ -326,7 +323,6 @@ async def motm_value_error(ctx: discord.ApplicationContext, error: discord.error
 
 
 # Results
-
 def reset_voting():
     # Generate archive name (prev month)
     archive_file_name = f"votes_{(datetime.now().month) - 1}_{datetime.now().year}"
@@ -352,5 +348,15 @@ async def check_for_month():
         edit_motm()
         asyncio.run(refresh_MOTM())
     
+# JOIN MESSAGE
+channel_new = 882248303822123021
+@bot.event
+async def on_member_join(member):
+    member_count = bot.get_guild(gm_guild_id).member_count
+    count_suffix = num2words(member_count, to='ordinal')[-2:]
+    await bot.get_channel(channel_new).send(f"Hello <@{member}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
+
+
+
 
 bot.run(TOKEN)
