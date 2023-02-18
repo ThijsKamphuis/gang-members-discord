@@ -2,6 +2,9 @@ OFFICIAL GANG MEMBERS DISCORD BOT
 =====================================
 [![GANG MEMBERS DISCORD](https://img.shields.io/badge/GANG_MEMBERS_DISCORD-5865F2?style=for-the-badge)](http://dc.gangmembers.eu)
 [![GANGMEMBERS.EU](https://img.shields.io/badge/GANGMEMBERS.EU-ae8cff?style=for-the-badge)](http://gangmembers.eu)
+<br>
+<br>
+![GitHub Repo stars](https://img.shields.io/github/stars/Thijskamphuis/gang-members-discord?color=%23ae8cff&style=for-the-badge)
 
 ABOUT THE BOT
 =============
