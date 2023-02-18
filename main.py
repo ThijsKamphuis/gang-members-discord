@@ -354,7 +354,7 @@ channel_new = 882248303822123021
 async def on_member_join(member):
     member_count = bot.get_guild(gm_guild_id).member_count
     count_suffix = num2words(member_count, to='ordinal')[-2:]
-    await bot.get_channel(channel_new).send(f"Hello @{member}, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
+    await bot.get_channel(channel_new).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
 
 
 
