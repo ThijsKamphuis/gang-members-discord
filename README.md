@@ -4,6 +4,7 @@ OFFICIAL GANG MEMBERS DISCORD BOT
 [![GANGMEMBERS.EU](https://img.shields.io/badge/GANGMEMBERS.EU-ae8cff?style=for-the-badge)](http://gangmembers.eu)
 <br>
 <br>
+![GitHub](https://img.shields.io/github/license/Thijskamphuis/gang-members-discord?color=%23ae8cff&style=for-the-badge)
 ![GitHub Repo stars](https://img.shields.io/github/stars/Thijskamphuis/gang-members-discord?color=%23ae8cff&style=for-the-badge)
 
 ABOUT THE BOT
@@ -12,37 +13,43 @@ This bot is used for programming miscellaneous commands to improve the servers f
 
 FUNCTIONS
 ---------
-**727** `/727`<br>
+**727** <br>
+`/727`<br>
 Sends a random 727 related gif in the channel the command is issued.
-It uses a .json file to store the relevant links. <br>
-```python
-@bot.slash_command(name="727", guild_ids=[GUILD], description='727?')
-async def gif727(ctx):
-    await ctx.respond(random.sample(json.load(open('gifs.json')), 1)[0])
-    return    
-```
+<br><br>
 
+**Vallas GIF** <br>
+`/vallas`<br>
+<img src="https://media.tenor.com/hsDbFj5ZI9AAAAAC/jorn-discord-mod.gif" width="249" height="140" />
+<br><br>
+
+**Manoe GIF** <br>
+`/manoe`<br>
+<img src="https://c.tenor.com/0krTPz7LLWYAAAAd/tenor.gif" width="249" height="140" />
+<br><br>
+
+**Gang Member Quotes** <br>
+`/gmquote` <br>
+Sends a random Gang Member quote in the channel the command is issued.
 <br>
 
-**Random Quote** `/gmquote` <br>
-Sends a random Gang Member quote in the channel the command is issued.
-All of the quotes are stored in a .json list of dictionaries that contain quote, author and year.<br>
-```python
-@bot.slash_command(name="gmquote", guild_ids=[GUILD], description='Random Gang Member Quote')
-async def gmquote(ctx):
-    gm_quote = random.sample(json.load(open('quotes.json')), 1)[0]
-    await ctx.respond(f'> {gm_quote["Quote"]}\n**~{gm_quote["Author"]}, {gm_quote["Year"]}**')  
-```
-It's also possible to add custom quotes to the database.
-This is done using the `/gmquoteadd` command. <br>
-```python
-@bot.slash_command(name="gmquoteadd", guild_ids=[GUILD], description='Add a Gang Member Quote')
-async def gmquote(ctx: discord.ApplicationContext, quote: str, author: str, year: int):
-    
-    quotelist = json.load(open('quotes.json'))
-    quotelist.append({"Quote":quote,"Author":author,"Year":year})    
-    with open('quotes.json', 'w') as outfile:
-        json.dump(quotelist, outfile)
-        
-    await ctx.respond(f'> {quote}\n**~{author}, {year}**\n Quote successfully added!')
-```
+`/gmquoteadd <quote> <author> <year>`<br>
+Add a quote to the database.
+<br>
+
+`/gmquotelist`<br>
+List all quotes.
+<br><br>
+
+**Member of the month** <br>
+Every month Gang Members vote for one Gang Member to be elected as Member of the month. <br>
+One cannot vote for admins or themselves.
+
+`/motminit` [admin only]<br>
+Initialize the status message.
+<br>
+
+`/motmvote <member>` <br>
+Vote for a Member of the month.
+<br><br>
+
