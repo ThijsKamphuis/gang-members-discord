@@ -1,6 +1,6 @@
 OFFICIAL GANG MEMBERS DISCORD BOT
 =====================================
-[![GANG MEMBERS DISCORD](https://img.shields.io/badge/GANG_MEMBERS_DISCORD-5865F2?style=for-the-badge)](http://dc.gangmembers.eu)
+![Discord](https://img.shields.io/discord/882248303822123018?color=%23ae8cff&label=GANG%20MEMBERS%20&logo=discord&logoColor=white&style=for-the-badge)
 [![GANGMEMBERS.EU](https://img.shields.io/badge/GANGMEMBERS.EU-ae8cff?style=for-the-badge)](http://gangmembers.eu)
 <br>
 <br>
