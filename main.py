@@ -55,6 +55,8 @@ async def on_ready():
     refresh_MOTM.start()
     check_for_month.start()
     
+    await bot.get_channel(882574276765564989).send(embed = GameRole_embed, view = GameRoleButtons())
+    
 ##### 727 #####
 @bot.slash_command(name="727", description='727?')
 async def gif727(ctx):
@@ -357,5 +359,54 @@ async def on_member_join(member):
     await bot.get_channel(channel_new).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
 
 
+# GAME ROLES
 
+channel_game_roles = 1053743315696234496
+# LOGOS
+logo_csgo = "<:CSGOLogo:1053745573641064448>"
+logo_ark = "<:ARKlogo:1053745532197150880>"
+logo_gtav = "<:GTAlogo:1053745557379764275>"
+logo_mc = "<:MClogo:1053745505814974505>"
+logo_l4d2 = "<:l4d2logo:1067494842449531042>"
+logo_amongus = "<:amonguslogo:1067494866281570394>"
+logo_zomboid = "<:Zomboidlogo:1067494894723145788>"
+
+
+GameRole_embed = discord.Embed(
+    title="Select your games",
+    color=11439359,
+    description="Here you can select from which games you want to see the channels."
+)
+GameRole_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
+
+
+class GameRoleButtons(discord.ui.View):
+    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_csgo)
+    async def csgo(self, button: discord.ui.Button, interaction: discord.Interaction):
+        interaction.response.defer()
+
+    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_ark)
+    async def ark(self, button: discord.ui.Button, interaction: discord.Interaction):
+        interaction.response.defer()   
+
+    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_gtav)
+    async def gtav(self, button: discord.ui.Button, interaction: discord.Interaction):
+        interaction.response.defer() 
+
+    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_mc)
+    async def mc(self, button: discord.ui.Button, interaction: discord.Interaction):
+        interaction.response.defer() 
+        
+    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_l4d2)
+    async def l4d2(self, button: discord.ui.Button, interaction: discord.Interaction):
+        interaction.response.defer()        
+        
+    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_amongus)
+    async def amongus(self, button: discord.ui.Button, interaction: discord.Interaction):
+        interaction.response.defer()        
+    
+    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_zomboid)
+    async def zomboid(self, button: discord.ui.Button, interaction: discord.Interaction):
+        interaction.response.defer()     
+        
 bot.run(TOKEN)
