@@ -1,11 +1,13 @@
 OFFICIAL GANG MEMBERS DISCORD BOT
 =====================================
-![Discord](https://img.shields.io/discord/882248303822123018?color=%23ae8cff&label=GANG%20MEMBERS%20&logo=discord&logoColor=white&style=for-the-badge)
-[![GANGMEMBERS.EU](https://img.shields.io/badge/GANGMEMBERS.EU-ae8cff?style=for-the-badge)](http://gangmembers.eu)
+![Discord](https://img.shields.io/discord/882248303822123018?color=%23ae8cff&label=GANG%20MEMBERS%20&logo=discord&logoColor=white&style=flat-square)
+[![GANGMEMBERS.EU](https://img.shields.io/badge/GANGMEMBERS.EU-ae8cff?&label=WEBSITE&style=flat-square)](http://gangmembers.eu)
 <br>
 <br>
-![GitHub](https://img.shields.io/github/license/Thijskamphuis/gang-members-discord?color=%23ae8cff&style=for-the-badge)
-![GitHub Repo stars](https://img.shields.io/github/stars/Thijskamphuis/gang-members-discord?color=%23ae8cff&style=for-the-badge)
+![GitHub last commit](https://img.shields.io/github/last-commit/Thijskamphuis/gang-members-discord?color=ae8cff&label=UPDATED&style=flat-square)
+![GitHub](https://img.shields.io/github/license/Thijskamphuis/gang-members-discord?color=%23ae8cff&style=flat-square)
+![GitHub Repo stars](https://img.shields.io/github/stars/Thijskamphuis/gang-members-discord?color=%23ae8cff&style=flat-square)
+
 
 ABOUT THE BOT
 =============
