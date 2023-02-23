@@ -1,6 +1,4 @@
-from cgitb import reset
-from ssl import cert_time_to_seconds
-from time import time, timezone
+import re
 import discord
 from discord.ext import commands
 from discord.ext import tasks
@@ -17,6 +15,7 @@ from re import sub
 import asyncio
 from num2words import num2words
 
+
 ##### .env ####
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -25,7 +24,14 @@ INTENTS = discord.Intents.all()
 
 gm_guild_id = 882248303822123018
 
-bot = discord.Bot(intents=INTENTS)
+class GangMemberBot(discord.Bot):
+    def __init__(self):
+        intents = discord.Intents.all()
+        
+        super().__init__(intents=intents)
+        
+
+bot = GangMemberBot()
 
 
 motm_channel_id = 1065028419487793182
@@ -54,8 +60,8 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="polish moments"))
     refresh_MOTM.start()
     check_for_month.start()
+    bot.add_view(GameRoleSelectMenu())
     
-    await bot.get_channel(882574276765564989).send(embed = GameRole_embed, view = GameRoleButtons())
     
 ##### 727 #####
 @bot.slash_command(name="727", description='727?')
@@ -359,9 +365,17 @@ async def on_member_join(member):
     await bot.get_channel(channel_new).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
 
 
-# GAME ROLES
-
 channel_game_roles = 1053743315696234496
+# ROLES
+role_csgo = 1053745890613010442
+role_ark = 1053745911987175544
+role_gtav = 1053745915426504735
+role_mc = 1053745896015274014
+role_l4d2 = 1067495011681312868
+role_amongus = 1067494997324206090
+role_zomboid = 1067494972137426974
+role_genshin = 1068517552055140432
+role_hoi4 = 1078440119645782137
 # LOGOS
 logo_csgo = "<:CSGOLogo:1053745573641064448>"
 logo_ark = "<:ARKlogo:1053745532197150880>"
@@ -370,7 +384,8 @@ logo_mc = "<:MClogo:1053745505814974505>"
 logo_l4d2 = "<:l4d2logo:1067494842449531042>"
 logo_amongus = "<:amonguslogo:1067494866281570394>"
 logo_zomboid = "<:Zomboidlogo:1067494894723145788>"
-
+logo_genshin = "<:genshinlogo:1078439499400478821>"
+logo_hoi4 = "<:Hoi4logo:1078439486553337906>"
 
 GameRole_embed = discord.Embed(
     title="Select your games",
@@ -378,35 +393,64 @@ GameRole_embed = discord.Embed(
     description="Here you can select from which games you want to see the channels."
 )
 GameRole_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
-
-
-class GameRoleButtons(discord.ui.View):
-    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_csgo)
-    async def csgo(self, button: discord.ui.Button, interaction: discord.Interaction):
-        interaction.response.defer()
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_ark)
-    async def ark(self, button: discord.ui.Button, interaction: discord.Interaction):
-        interaction.response.defer()   
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_gtav)
-    async def gtav(self, button: discord.ui.Button, interaction: discord.Interaction):
-        interaction.response.defer() 
-
-    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_mc)
-    async def mc(self, button: discord.ui.Button, interaction: discord.Interaction):
-        interaction.response.defer() 
+ 
+ 
+class GameRoleSelectMenu(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
         
-    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_l4d2)
-    async def l4d2(self, button: discord.ui.Button, interaction: discord.Interaction):
-        interaction.response.defer()        
-        
-    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_amongus)
-    async def amongus(self, button: discord.ui.Button, interaction: discord.Interaction):
-        interaction.response.defer()        
+    GameRolesList = [
+            discord.SelectOption(label = "Counter Strike: Global Offensive", emoji = logo_csgo),           
+            discord.SelectOption(label = "ARK: Survival Evolved",emoji = logo_ark),
+            discord.SelectOption(label = "Grand Theft Auto V", emoji = logo_gtav),
+            discord.SelectOption(label = "Minecraft", emoji = logo_mc),
+            discord.SelectOption(label = "Left 4 Dead 2", emoji = logo_l4d2),
+            discord.SelectOption(label = "Among Us", emoji = logo_amongus),
+            discord.SelectOption(label = "Project Zomboid", emoji = logo_zomboid),
+            discord.SelectOption(label = "Genshin Impact", emoji = logo_genshin),
+            discord.SelectOption(label = "Hearts of Iron IV", emoji = logo_hoi4),
+        ]
     
-    @discord.ui.button(style=discord.ButtonStyle.blurple, emoji=logo_zomboid)
-    async def zomboid(self, button: discord.ui.Button, interaction: discord.Interaction):
-        interaction.response.defer()     
+    @discord.ui.select(
+        placeholder = "Select your games",
+        min_values = 0,
+        max_values= len(GameRolesList),
+        options= GameRolesList,
+        custom_id = "ui.select:gameselectmenu"  
+    )
+    async def SelectMenu_callback(self, select: discord.ui.Select, interaction: discord.Interaction):            
+        await interaction.response.send_message("Your roles have been updated", ephemeral= True, delete_after= 5)
+
         
+        
+    
+@bot.slash_command(label="gamerolesinit",description="Initialize game roles (STAFF ONLY)")
+@commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
+async def gamerolesinit(ctx):
+    await ctx.respond("Initializing")
+    await bot.get_channel(882574276765564989).send(embed = GameRole_embed, view = GameRoleSelectMenu())
+
+
+
+@gamerolesinit.error
+async def gamerolesinit_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
+    if isinstance(error, commands.MissingAnyRole):
+        await ctx.respond("You do not have permission to use this command. (STAFF ONLY)", ephemeral=True)
+    else:
+        raise error
+
+# SEND MESSAGE AS BOT
+@bot.slash_command(label="sendmsg",description="(DEV ONLY)")
+@commands.has_any_role(GMDev_id)
+async def sendmsg(ctx: discord.ApplicationContext, channel: str, message: str):
+    await ctx.respond("Sending", ephemeral = True)
+    await bot.get_channel(int(channel)).send(message)
+
+@sendmsg.error
+async def sendmsg_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
+    if isinstance(error, commands.MissingAnyRole):
+        await ctx.respond("You do not have permission to use this command. (DEV ONLY)", ephemeral=True)
+    else:
+        raise error
+    
 bot.run(TOKEN)
