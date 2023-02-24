@@ -346,7 +346,12 @@ def edit_motm():
     #remove motm role from current motm
     #give role to next motm
     print()
+
+async def motm_role():
+    motm = get_motm()
+    await motm.remove_roles(bot.get_guild(gm_guild_id).get_role())
     
+  
 
 @tasks.loop(minutes=1)
 async def check_for_month():
@@ -355,7 +360,7 @@ async def check_for_month():
         edit_motm()
         asyncio.run(refresh_MOTM())
     
-# JOIN MESSAGE
+#### JOIN MESSAGE ####
 channel_new = 882248303822123021
 @bot.event
 async def on_member_join(member):
@@ -364,6 +369,8 @@ async def on_member_join(member):
     await bot.get_channel(channel_new).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
 
 
+
+#### ROLES ####
 channel_game_roles = 1053743315696234496
 # ROLES
 game_roles = {
@@ -478,7 +485,9 @@ async def gamerolesinit_error(ctx: discord.ApplicationContext, error: discord.Di
     else:
         raise error
 
-# SEND MESSAGE AS BOT
+
+
+#### SEND MESSAGE ####
 @bot.slash_command(label="sendmsg",description="(DEV ONLY)")
 @commands.has_any_role(GMDev_id)
 async def sendmsg(ctx: discord.ApplicationContext, channel: str, message: str):
