@@ -214,16 +214,6 @@ def motm_embed_gen():
         value=str(votingdaysleft()),
         inline=True
     )
-    count_votes()
-    
-    standings_list = "\n".join([f"{i}. <@{user[0]}>: **{user[1]}**" for i, user in enumerate(vote_standings, start=1)])
-    
-
-    motm_embed.add_field(
-        name="Standings:",
-        value=standings_list,
-        inline=False
-    )
 
     motm_embed.set_footer(text="Use /motmvote @user to vote!")
 
@@ -342,22 +332,21 @@ def reset_voting():
         json.dump([], outfile, indent=4)
     
 
-def edit_motm():
-    #remove motm role from current motm
-    #give role to next motm
-    print()
-
-async def motm_role():
+async def edit_motm_role():
     motm = get_motm()
-    await motm.remove_roles(bot.get_guild(gm_guild_id).get_role())
+    motm_role = bot.get_guild(gm_guild_id).get_role(motm_role_id)
     
+    await motm.remove_roles(motm_role)
+    
+    vote_standings = count_votes()
+    await bot.get_guild(gm_guild_id).get_member(vote_standings[0][0]).add_roles(motm_role)
   
 
 @tasks.loop(minutes=1)
 async def check_for_month():
     if datetime.now().day == 1:
         reset_voting()
-        edit_motm()
+        edit_motm_role()
         asyncio.run(refresh_MOTM())
     
 #### JOIN MESSAGE ####
@@ -500,5 +489,6 @@ async def sendmsg_error(ctx: discord.ApplicationContext, error: discord.DiscordE
         await ctx.respond("You do not have permission to use this command. (DEV ONLY)", ephemeral=True)
     else:
         raise error
-    
+
+ 
 bot.run(TOKEN)
