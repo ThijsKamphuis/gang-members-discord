@@ -1,3 +1,4 @@
+from itertools import count
 import discord
 from discord.ext import commands
 from discord.ext import tasks
@@ -201,8 +202,8 @@ def motm_embed_gen():
         color=motm.color
     )
 
-    motm_embed.set_thumbnail(url=motm.display_avatar.url)
-    
+    motm_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
+    motm_embed.set_image(url=motm.display_avatar.url)
     motm_embed.add_field(
         name="Current MotM:",
         value=f"<@{motm.id}>",
@@ -330,29 +331,63 @@ def reset_voting():
     # Empty votes
     with open('databases/motm_votes.json', 'w') as outfile:
         json.dump([], outfile, indent=4)
+        
+        
+async def motm_announce():
+    motm = get_motm()
+    count_votes()
+    standings_list = "\n".join([f"{i}. <@{user[0]}>: **{user[1]}**" for i, user in enumerate(vote_standings, start=1)])
+    
+    motm_announce_embed = discord.Embed(
+        title="New Member of the Month",
+        color=motm.color
+    )
+
+    motm_announce_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
+    motm_announce_embed.set_image(url=motm.display_avatar.url)
+    
+    motm_announce_embed.add_field(
+        name=f"Our new Member of the month is {motm.display_name}!",
+        value=f"<@{motm.id}> won with {vote_standings[0][1]} votes.",
+        inline=False
+    )
     
 
+    motm_announce_embed.add_field(
+    name="Results:",
+    value=standings_list,
+    inline=False
+    )
+    
+    await bot.get_channel(882574276765564989).send(embed= motm_announce_embed)
+    
+    
 async def edit_motm_role():
     motm = get_motm()
     motm_role = bot.get_guild(gm_guild_id).get_role(motm_role_id)
     
     await motm.remove_roles(motm_role)
     
-    vote_standings = count_votes()
+    count_votes()
     await bot.get_guild(gm_guild_id).get_member(vote_standings[0][0]).add_roles(motm_role)
   
 
 @tasks.loop(minutes=1)
 async def check_for_month():
     if datetime.now().day == 1:
-        reset_voting()
         edit_motm_role()
-        asyncio.run(refresh_MOTM())
+        motm_announce()
+        reset_voting()
+        await refresh_MOTM()
     
-#### JOIN MESSAGE ####
+#### ON MEMBER JOIN ####
 channel_new = 882248303822123021
 @bot.event
 async def on_member_join(member):
+    # NPC ROLE
+    await member.add_roles(bot.get_guild(gm_guild_id).get_role(882251536653230151))
+    
+    # JOIN MESSAGE
     member_count = bot.get_guild(gm_guild_id).member_count
     count_suffix = num2words(member_count, to='ordinal')[-2:]
     await bot.get_channel(channel_new).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
@@ -490,5 +525,4 @@ async def sendmsg_error(ctx: discord.ApplicationContext, error: discord.DiscordE
     else:
         raise error
 
- 
 bot.run(TOKEN)
