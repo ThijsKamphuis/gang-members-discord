@@ -1,4 +1,3 @@
-import re
 import discord
 from discord.ext import commands
 from discord.ext import tasks
@@ -367,25 +366,31 @@ async def on_member_join(member):
 
 channel_game_roles = 1053743315696234496
 # ROLES
-role_csgo = 1053745890613010442
-role_ark = 1053745911987175544
-role_gtav = 1053745915426504735
-role_mc = 1053745896015274014
-role_l4d2 = 1067495011681312868
-role_amongus = 1067494997324206090
-role_zomboid = 1067494972137426974
-role_genshin = 1068517552055140432
-role_hoi4 = 1078440119645782137
+game_roles = {
+    "Counter Strike: Global Offensive":1053745890613010442,
+    "ARK: Survival Evolved":1053745911987175544,
+    "Grand Theft Auto V":1053745915426504735,
+    "Minecraft":1053745896015274014,
+    "Left 4 Dead 2":1067495011681312868,
+    "Among Us":1067494997324206090,
+    "Project Zomboid":1067494972137426974,
+    "Genshin Impact":1068517552055140432,
+    "Hearts of Iron IV":1078440119645782137,
+}
+
 # LOGOS
-logo_csgo = "<:CSGOLogo:1053745573641064448>"
-logo_ark = "<:ARKlogo:1053745532197150880>"
-logo_gtav = "<:GTAlogo:1053745557379764275>"
-logo_mc = "<:MClogo:1053745505814974505>"
-logo_l4d2 = "<:l4d2logo:1067494842449531042>"
-logo_amongus = "<:amonguslogo:1067494866281570394>"
-logo_zomboid = "<:Zomboidlogo:1067494894723145788>"
-logo_genshin = "<:genshinlogo:1078439499400478821>"
-logo_hoi4 = "<:Hoi4logo:1078439486553337906>"
+game_logos = {
+    "logo_csgo":"<:CSGOLogo:1053745573641064448>",
+    "logo_ark":"<:ARKlogo:1053745532197150880>",
+    "logo_gtav":"<:GTAlogo:1053745557379764275>",
+    "logo_mc":"<:MClogo:1053745505814974505>",
+    "logo_l4d2":"<:l4d2logo:1067494842449531042>",
+    "logo_amongus":"<:amonguslogo:1067494866281570394>",
+    "logo_zomboid":"<:Zomboidlogo:1067494894723145788>",
+    "logo_genshin":"<:genshinlogo:1078439499400478821>",
+    "logo_hoi4":"<:Hoi4logo:1078439486553337906>",
+}
+
 
 GameRole_embed = discord.Embed(
     title="Select your games",
@@ -400,15 +405,42 @@ class GameRoleSelectMenu(discord.ui.View):
         super().__init__(timeout=None)
         
     GameRolesList = [
-            discord.SelectOption(label = "Counter Strike: Global Offensive", emoji = logo_csgo),           
-            discord.SelectOption(label = "ARK: Survival Evolved",emoji = logo_ark),
-            discord.SelectOption(label = "Grand Theft Auto V", emoji = logo_gtav),
-            discord.SelectOption(label = "Minecraft", emoji = logo_mc),
-            discord.SelectOption(label = "Left 4 Dead 2", emoji = logo_l4d2),
-            discord.SelectOption(label = "Among Us", emoji = logo_amongus),
-            discord.SelectOption(label = "Project Zomboid", emoji = logo_zomboid),
-            discord.SelectOption(label = "Genshin Impact", emoji = logo_genshin),
-            discord.SelectOption(label = "Hearts of Iron IV", emoji = logo_hoi4),
+            discord.SelectOption(
+                label = "Counter Strike: Global Offensive", 
+                emoji = game_logos["logo_csgo"]
+                ),           
+            discord.SelectOption(
+                label = "ARK: Survival Evolved",
+                emoji = game_logos["logo_ark"]
+                ),
+            discord.SelectOption(
+                label = "Grand Theft Auto V",
+                emoji = game_logos["logo_gtav"]
+                ),
+            discord.SelectOption(
+                label = "Minecraft",
+                emoji = game_logos["logo_mc"]
+                ),
+            discord.SelectOption(
+                label = "Left 4 Dead 2",
+                emoji = game_logos["logo_l4d2"]
+                ),
+            discord.SelectOption(
+                label = "Among Us",
+                emoji = game_logos["logo_amongus"]
+                ),
+            discord.SelectOption(
+                label = "Project Zomboid",
+                emoji = game_logos["logo_zomboid"]
+                ),
+            discord.SelectOption(
+                label = "Genshin Impact",
+                emoji = game_logos["logo_genshin"]
+                ),
+            discord.SelectOption(
+                label = "Hearts of Iron IV",
+                emoji = game_logos["logo_hoi4"]
+                ),
         ]
     
     @discord.ui.select(
@@ -420,15 +452,22 @@ class GameRoleSelectMenu(discord.ui.View):
     )
     async def SelectMenu_callback(self, select: discord.ui.Select, interaction: discord.Interaction):            
         await interaction.response.send_message("Your roles have been updated", ephemeral= True, delete_after= 5)
-
-        
-        
-    
+        roles_member = bot.get_guild(gm_guild_id).get_member(interaction.user.id)
+        for key in game_roles:
+            if key in select.values:
+                await roles_member.add_roles(bot.get_guild(gm_guild_id).get_role(game_roles[key]))
+            else:
+                await roles_member.remove_roles(bot.get_guild(gm_guild_id).get_role(game_roles[key]))
+   
+   
+   
+   
+      
 @bot.slash_command(label="gamerolesinit",description="Initialize game roles (STAFF ONLY)")
 @commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
 async def gamerolesinit(ctx):
     await ctx.respond("Initializing")
-    await bot.get_channel(882574276765564989).send(embed = GameRole_embed, view = GameRoleSelectMenu())
+    await bot.get_channel(channel_game_roles).send(embed = GameRole_embed, view = GameRoleSelectMenu())
 
 
 
