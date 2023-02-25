@@ -1,4 +1,4 @@
-from itertools import count
+from ctypes.wintypes import HMODULE
 import discord
 from discord.ext import commands
 from discord.ext import tasks
@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 import json
 import random
-from datetime import datetime, timezone, tzinfo
+from datetime import datetime, date, timedelta
 from dateutil import relativedelta
 import math
 from collections import defaultdict
@@ -359,7 +359,7 @@ async def motm_announce():
     inline=False
     )
     
-    await bot.get_channel(882574276765564989).send(embed= motm_announce_embed)
+    await bot.get_channel(882252560608657408).send(embed= motm_announce_embed)
     
     
 async def edit_motm_role():
@@ -371,12 +371,14 @@ async def edit_motm_role():
     count_votes()
     await bot.get_guild(gm_guild_id).get_member(vote_standings[0][0]).add_roles(motm_role)
   
+motm_month = (date.today().month) + 1
+first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=0)
 
 @tasks.loop(minutes=1)
 async def check_for_month():
-    if datetime.now().day == 1:
-        edit_motm_role()
-        motm_announce()
+    if datetime.now() >= first_of_month <= (datetime.now() + timedelta(minutes=1)):
+        await edit_motm_role()
+        await motm_announce()
         reset_voting()
         await refresh_MOTM()
     
