@@ -314,10 +314,10 @@ async def motmvote_role_error(ctx: discord.ApplicationContext, error: discord.Di
     else:
         raise error   
   
-#@motmvote.error   
-#async def motm_value_error(ctx: discord.ApplicationContext, error: discord.errors.ApplicationCommandInvokeError):
-    #if isinstance(error, discord.errors.ApplicationCommandInvokeError):
-        #await ctx.respond("Invalid input, mention a user", ephemeral=True)
+@motmvote.error   
+async def motm_value_error(ctx: discord.ApplicationContext, error: discord.errors.ApplicationCommandInvokeError):
+    if isinstance(error, discord.errors.ApplicationCommandInvokeError):
+        await ctx.respond("Invalid input, mention a user", ephemeral=True)
 
 
 # Results
