@@ -1,4 +1,3 @@
-from ctypes.wintypes import HMODULE
 import discord
 from discord.ext import commands
 from discord.ext import tasks
@@ -12,11 +11,10 @@ from dateutil import relativedelta
 import math
 from collections import defaultdict
 from re import sub
-import asyncio
 from num2words import num2words
 
 
-##### .env ####
+#### .env ####
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('GUILD_ID')
@@ -28,9 +26,7 @@ class GangMemberBot(discord.Bot):
     def __init__(self):
         intents = discord.Intents.all()
         
-        super().__init__(intents=intents)
-        
-
+        super().__init__(intents=intents)     
 bot = GangMemberBot()
 
 
@@ -319,7 +315,19 @@ async def motm_value_error(ctx: discord.ApplicationContext, error: discord.error
     if isinstance(error, discord.errors.ApplicationCommandInvokeError):
         await ctx.respond("Invalid input, mention a user", ephemeral=True)
 
-
+# View standings
+@bot.slash_command(name="motmstandings", description="View MOTM standings (ADMIN ONLY)")
+@commands.has_any_role(GMAdmin_id)
+async def motmstandings(ctx):
+    ctx.respond(count_votes())
+    
+@motmvote.error
+async def motmstandings_role_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
+    if isinstance(error, commands.MissingAnyRole):
+        await ctx.respond("You do not have permission to use this command. (ADMIN ONLY)", ephemeral=True)
+    else:
+        raise error     
+    
 # Results
 def reset_voting():
     # Generate archive name (prev month)
