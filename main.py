@@ -319,7 +319,7 @@ async def motm_value_error(ctx: discord.ApplicationContext, error: discord.error
 @bot.slash_command(name="motmstandings", description="View MOTM standings (ADMIN ONLY)")
 @commands.has_any_role(GMAdmin_id)
 async def motmstandings(ctx):
-    await ctx.respond(count_votes(), ephemeral = True)
+    await ctx.respond("\n".join([f"{i}. <@{user[0]}>: **{user[1]}**" for i, user in enumerate(vote_standings, start=1)]), ephemeral = True)
     
 @motmvote.error
 async def motmstandings_role_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
