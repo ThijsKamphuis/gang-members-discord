@@ -19,14 +19,14 @@ import mysql.connector
 load_dotenv()
 
 #### SQL ####
-event_db = mysql.connector.connect(
-    host= os.getenv('SQL_HOST'),
-    user= os.getenv('SQL_USER'),
-    password= os.getenv('SQL_PASS'),
-    database= os.getenv('SQL_DB')
-)
+#event_db = mysql.connector.connect(
+    #host= os.getenv('SQL_HOST'),
+    #user= os.getenv('SQL_USER'),
+    #password= os.getenv('SQL_PASS'),
+    #database= os.getenv('SQL_DB')
+#)
 
-event_db_cursor = event_db.cursor()
+#event_db_cursor = event_db.cursor()
 
 #sql = "INSERT INTO events (id, owner, title, content, creationdate, creationtime, eventdate, eventtime, maxvisitors, photo, location, visibility) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 #val = (random.randint(10000000000,99999999999), "65872", "TestGM", "pp", "28-02-2023", "22:10", "28-02-2023", "23:23", "69", "", "", "visible")
