@@ -321,9 +321,9 @@ async def motm_value_error(ctx: discord.ApplicationContext, error: discord.error
 async def motmstandings(ctx):
     await ctx.respond("\n".join([f"{i}. <@{user[0]}>: **{user[1]}**" for i, user in enumerate(count_votes(), start=1)]), ephemeral = True)
     
-@motmvote.error
+@motmstandings.error
 async def motmstandings_role_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
-    if isinstance(error, commands.errors.MissingAnyRole):
+    if isinstance(error, commands.MissingAnyRole):
         await ctx.respond("You do not have permission to use this command. (ADMIN ONLY)", ephemeral=True)
     else:
         raise error     
