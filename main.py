@@ -13,7 +13,6 @@ from collections import defaultdict
 from re import sub
 from num2words import num2words
 
-
 #### .env ####
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -315,11 +314,12 @@ async def motm_value_error(ctx: discord.ApplicationContext, error: discord.error
     if isinstance(error, discord.errors.ApplicationCommandInvokeError):
         await ctx.respond("Invalid input, mention a user", ephemeral=True)
 
+
 # View standings
 @bot.slash_command(name="motmstandings", description="View MOTM standings (ADMIN ONLY)")
 @commands.has_any_role(GMAdmin_id)
 async def motmstandings(ctx):
-    ctx.respond(count_votes(), ephemeral = True)
+    await ctx.respond(count_votes(), ephemeral = True)
     
 @motmvote.error
 async def motmstandings_role_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
