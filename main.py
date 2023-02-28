@@ -19,14 +19,14 @@ import mysql.connector
 load_dotenv()
 
 #### SQL ####
-#event_db = mysql.connector.connect(
-    #host= os.getenv('SQL_HOST'),
-    #user= os.getenv('SQL_USER'),
-    #password= os.getenv('SQL_PASS'),
-    #database= os.getenv('SQL_DB')
-#)
+event_db = mysql.connector.connect(
+    host= os.getenv('SQL_HOST'),
+    user= os.getenv('SQL_USER'),
+    password= os.getenv('SQL_PASS'),
+    database= os.getenv('SQL_DB')
+)
 
-#event_db_cursor = event_db.cursor()
+event_db_cursor = event_db.cursor()
 
 #sql = "INSERT INTO events (id, owner, title, content, creationdate, creationtime, eventdate, eventtime, maxvisitors, photo, location, visibility) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 #val = (random.randint(10000000000,99999999999), "65872", "TestGM", "pp", "28-02-2023", "22:10", "28-02-2023", "23:23", "69", "", "", "visible")
@@ -377,26 +377,17 @@ async def edit_motm_role():
     motm_role = bot.get_guild(gm_guild_id).get_role(motm_role_id)
     
     await motm.remove_roles(motm_role)
-    
-    await bot.get_guild(gm_guild_id).get_member(vote_standings[0][0]).add_roles(motm_role)
+    await bot.get_guild(gm_guild_id).get_member(int(vote_standings[0][0])).add_roles(motm_role)
   
 
 #### CHECK FOR NEW MONTH ####
 @tasks.loop(minutes=1)
 async def check_for_month():
-    print("check")
 
     motm_month = (date.today().month)
-    first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=23)
-    
-    print(first_of_month)
-    print(datetime.now())
-    print((datetime.now() + timedelta(minutes=1)))
-    
-    print(first_of_month <= datetime.now())
-    
+    first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=1)
+        
     if (first_of_month <= datetime.now() <= (datetime.now() + timedelta(minutes=1))):
-        print("reset")
         count_votes()
         if vote_standings[0][1] == vote_standings[1][1]:
             if random.randint(1,2) == 2:
