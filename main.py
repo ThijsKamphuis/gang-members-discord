@@ -323,7 +323,7 @@ async def motmstandings(ctx):
     
 @motmvote.error
 async def motmstandings_role_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
-    if isinstance(error, commands.MissingAnyRole):
+    if isinstance(error, commands.errors.MissingAnyRole):
         await ctx.respond("You do not have permission to use this command. (ADMIN ONLY)", ephemeral=True)
     else:
         raise error     
