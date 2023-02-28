@@ -12,15 +12,26 @@ import math
 from collections import defaultdict
 from re import sub
 from num2words import num2words
+import mysql.connector
 
-#### .env ####
+
+#### SETUP ###################################################
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
-GUILD = os.getenv('GUILD_ID')
-INTENTS = discord.Intents.all()
 
-gm_guild_id = 882248303822123018
+#### SQL ####
+event_db = mysql.connector.connect(
+    host= os.getenv('SQL_HOST'),
+    user= os.getenv('SQL_USER'),
+    password= os.getenv('SQL_PASS'),
+    database= os.getenv('SQL_DB')
+)
 
+event_db_cursor = event_db.cursor()
+
+#sql = "INSERT INTO events (id, owner, title, content, creationdate, creationtime, eventdate, eventtime, maxvisitors, photo, location, visibility) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+#val = (random.randint(10000000000,99999999999), "65872", "TestGM", "pp", "28-02-2023", "22:10", "28-02-2023", "23:23", "69", "", "", "visible")
+
+#### BOT INIT ####
 class GangMemberBot(discord.Bot):
     def __init__(self):
         intents = discord.Intents.all()
@@ -28,6 +39,9 @@ class GangMemberBot(discord.Bot):
         super().__init__(intents=intents)     
 bot = GangMemberBot()
 
+#### IDS ####
+
+gm_guild_id = 882248303822123018
 
 motm_channel_id = 1065028419487793182
 motm_role_id = 1062507887718567986
@@ -37,18 +51,7 @@ GMStaff_id = 1067195296993517568
 GMAdmin_id = 882248427298230292
 GM_id = 882248832354750524
 
-
-def get_motm() -> discord.Member:
-    motm = bot.get_guild(gm_guild_id).get_role(motm_role_id).members[0]
-    return motm
-
-
-def votingdaysleft():
-    voting_days_left = (abs(datetime.today() - ((datetime.today() + (relativedelta.relativedelta(months=1))).replace(day=1, hour= 0, minute= 0, second=1, microsecond= 0)))).days
-    return voting_days_left
-
-
-##### STARTUP #####
+#### STARTUP ###################################################
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
@@ -58,20 +61,22 @@ async def on_ready():
     bot.add_view(GameRoleSelectMenu())
     
     
-##### 727 #####
+    
+#### GIF COMMANDS ###################################################  
+#### 727 GIF ####
 @bot.slash_command(name="727", description='727?')
 async def gif727(ctx):
 
     await ctx.respond(random.sample(json.load(open('databases/gifs.json', encoding="utf-8")), 1)[0])
     return    
 
-##### JORN GIF #####
+#### JORN GIF ####
 @bot.slash_command(name="vallas", description='JORN (VALLAS)')
 async def jorngif(ctx):
     await ctx.respond("https://tenor.com/view/jorn-discord-mod-letterlijk-jorn-gif-27345172")
     return    
 
-##### MANOE GIF #####
+#### MANOE GIF ####
 @bot.slash_command(name="manoe", description='MANOE')
 async def manoegif(ctx):
     await ctx.respond("https://tenor.com/view/manoe-gangmembers-gm-gif-27494707")
@@ -79,7 +84,7 @@ async def manoegif(ctx):
 
 
 
-##### QUOTES #####
+##### QUOTES ###################################################
 def get_quote_page(page):
     quote_list = json.load(open('databases/quotes.json', encoding="utf-8"))
 
@@ -89,8 +94,6 @@ def get_quote_page(page):
     global current_page, total_pages
     current_page = page
     total_pages = totalpages
-
-
 
     global quote_embed
     if page < totalpages:
@@ -122,27 +125,24 @@ def get_quote_page(page):
             )
             quoteindex += 1
 
-# GM QUOTE RANDOM
+#### QUOTE RANDOM ####
 @bot.slash_command(name="gmquote", description='Random Gang Member Quote')
 async def gmquote(ctx):
     gm_quote = random.sample(json.load(open('databases/quotes.json', encoding="utf-8")), 1)[0]
     await ctx.respond(f'> {gm_quote["Quote"]}\n**~{gm_quote["Author"]}, {gm_quote["Year"]}**')
 
 
-# GM QUOTE ADD
+#### QUOTE ADD ####
 @bot.slash_command(name="gmquoteadd", description='Add a Gang Member Quote')
-async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, year: int):
-    
+async def gmquoteadd(ctx: discord.ApplicationContext, quote: str, author: str, year: int):     
     quotelist = json.load(open('databases/quotes.json', encoding="utf-8"))
-    quotelist.append({"Quote":quote,"Author":author,"Year":year})    
+    quotelist.append({"Quote":quote,"Author":author,"Year":year})
     with open('databases/quotes.json', 'w') as outfile:
         json.dump(quotelist, outfile, indent=4)
 
     await ctx.respond(f'> {quote}\n**~{author}, {year}**\n Quote successfully added!')
 
-
-# GM QUOTE LIST ALL
-
+#### QUOTE LIST ####
 class QuoteButtonsView(discord.ui.View):
     @discord.ui.button(label="Prev", style=discord.ButtonStyle.primary, emoji="⬅")
     async def prev(self, button: discord.ui.Button, interaction: discord.Interaction):
@@ -163,17 +163,22 @@ class QuoteButtonsView(discord.ui.View):
 
 @bot.slash_command(name="gmquotelist", description='List all Gang Member Quotes')
 async def gmquotelist(ctx):
-
     get_quote_page(1)
     await ctx.respond(embed = quote_embed, view = QuoteButtonsView(), ephemeral=True)
 
 
+##### MOTM ###################################################
+
+def get_motm() -> discord.Member:
+    motm = bot.get_guild(gm_guild_id).get_role(motm_role_id).members[0]
+    return motm
+
+def votingdaysleft():
+    voting_days_left = (abs(datetime.today() - ((datetime.today() + (relativedelta.relativedelta(months=1))).replace(day=1, hour= 0, minute= 0, second=1, microsecond= 0)))).days
+    return voting_days_left
 
 
-
-##### MOTM #####
-
-# Count votes
+#### COUNT VOTES ####
 def count_votes():
     global vote_standings
     motm_votes_db = json.load(open('databases/motm_votes.json', encoding="utf-8"))
@@ -188,7 +193,7 @@ def count_votes():
     return vote_standings
     
 
-# Generate embed with most recent data
+#### GENERATE EMBED ####
 def motm_embed_gen():
     motm = get_motm()
     global motm_embed
@@ -213,22 +218,19 @@ def motm_embed_gen():
 
     motm_embed.set_footer(text="Use /motmvote @user to vote!")
 
+#### EDIT EMBED ####
 async def edit_embed():
-    
-    # Generate embed
     motm_embed_gen()
     
-    # Fetch message ID
     motm_db = json.load(open('databases/motm.json', encoding="utf-8"))
     motm_db_ID = motm_db[0]["MOTM_Message_ID"]
     
-    # Edit message
     ch = bot.get_channel(motm_channel_id)  
     msg = await ch.fetch_message(motm_db_ID)
     await msg.edit(embed= motm_embed)
     return
 
-# INIT
+#### INIT MOTM ####
 @bot.slash_command(name="motminit", description="Initialize MOTM (STAFF ONLY)")
 @commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
 async def motminit(ctx):
@@ -252,7 +254,7 @@ async def motminit_error(ctx: discord.ApplicationContext, error: discord.Discord
     else:
         raise error
 
-# Delete embed
+#### DEL EMBED ####
 @bot.slash_command(name="motmdel", description="Purge MOTM channel (DEV ONLY)")
 @commands.has_any_role(GMDev_id)
 async def motmdel(ctx):
@@ -272,7 +274,7 @@ async def motmdel(ctx):
 async def refresh_MOTM():
     await edit_embed()
  
-# Vote  
+#### VOTE MOTM ####
 @bot.slash_command(name="motmvote", description="Vote for MOTM (GM ONLY)")
 @commands.has_any_role(GM_id)
 async def motmvote(ctx: discord.ApplicationContext, user: str):
@@ -296,7 +298,6 @@ async def motmvote(ctx: discord.ApplicationContext, user: str):
                 await ctx.respond(f"You voted for <@{user}>.", ephemeral=True)
             else:
                 await ctx.respond("You already voted", ephemeral=True)
-
     else:
         await ctx.respond("Chosen user is not a GangMember", ephemeral=True)
     
@@ -315,7 +316,7 @@ async def motm_value_error(ctx: discord.ApplicationContext, error: discord.error
         await ctx.respond("Invalid input, mention a user", ephemeral=True)
 
 
-# View standings
+#### MOTM STANDINGS ####
 @bot.slash_command(name="motmstandings", description="View MOTM standings (ADMIN ONLY)")
 @commands.has_any_role(GMAdmin_id)
 async def motmstandings(ctx):
@@ -328,7 +329,7 @@ async def motmstandings_role_error(ctx: discord.ApplicationContext, error: disco
     else:
         raise error     
     
-# Results
+#### RESET VOTES ####
 def reset_voting():
     # Generate archive name (prev month)
     archive_file_name = f"votes_{(datetime.now().month) - 1}_{datetime.now().year}"
@@ -340,7 +341,7 @@ def reset_voting():
     with open('databases/motm_votes.json', 'w') as outfile:
         json.dump([], outfile, indent=4)
         
-        
+#### ANNOUNCE MOTM ####       
 async def motm_announce():
     motm = get_motm()
     
@@ -370,7 +371,7 @@ async def motm_announce():
     
     await bot.get_channel(882252560608657408).send(embed= motm_announce_embed)
     
-    
+#### EDIT MOTM ROLE ####
 async def edit_motm_role():
     motm = get_motm()
     motm_role = bot.get_guild(gm_guild_id).get_role(motm_role_id)
@@ -380,12 +381,22 @@ async def edit_motm_role():
     await bot.get_guild(gm_guild_id).get_member(vote_standings[0][0]).add_roles(motm_role)
   
 
-
+#### CHECK FOR NEW MONTH ####
 @tasks.loop(minutes=1)
 async def check_for_month():
-    motm_month = (date.today().month) + 1
-    first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=0)
-    if datetime.now() >= first_of_month <= (datetime.now() + timedelta(minutes=1)):
+    print("check")
+
+    motm_month = (date.today().month)
+    first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=23)
+    
+    print(first_of_month)
+    print(datetime.now())
+    print((datetime.now() + timedelta(minutes=1)))
+    
+    print(first_of_month <= datetime.now())
+    
+    if (first_of_month <= datetime.now() <= (datetime.now() + timedelta(minutes=1))):
+        print("reset")
         count_votes()
         if vote_standings[0][1] == vote_standings[1][1]:
             if random.randint(1,2) == 2:
@@ -396,21 +407,18 @@ async def check_for_month():
         reset_voting()
         await refresh_MOTM()
     
-#### ON MEMBER JOIN ####
-channel_new = 882248303822123021
+#### ON MEMBER JOIN ###################################################
 @bot.event
 async def on_member_join(member):
-    # NPC ROLE
     await member.add_roles(bot.get_guild(gm_guild_id).get_role(882251536653230151))
     
-    # JOIN MESSAGE
     member_count = bot.get_guild(gm_guild_id).member_count
     count_suffix = num2words(member_count, to='ordinal')[-2:]
-    await bot.get_channel(channel_new).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
+    await bot.get_channel(882248303822123021).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
 
 
 
-#### ROLES ####
+#### ROLES ###################################################
 channel_game_roles = 1053743315696234496
 # ROLES
 game_roles = {
@@ -527,7 +535,7 @@ async def gamerolesinit_error(ctx: discord.ApplicationContext, error: discord.Di
 
 
 
-#### SEND MESSAGE ####
+#### SEND MESSAGE AS BOT ###################################################
 @bot.slash_command(label="sendmsg",description="(DEV ONLY)")
 @commands.has_any_role(GMDev_id)
 async def sendmsg(ctx: discord.ApplicationContext, channel: str, message: str):
@@ -542,4 +550,8 @@ async def sendmsg_error(ctx: discord.ApplicationContext, error: discord.DiscordE
         raise error
 
 
-bot.run(TOKEN)
+
+#### EVENTS ###################################################
+
+
+bot.run(os.getenv('DISCORD_TOKEN'))
