@@ -343,7 +343,8 @@ def reset_voting():
         
 async def motm_announce():
     motm = get_motm()
-    count_votes()
+    
+    
     standings_list = "\n".join([f"{i}. <@{user[0]}>: **{user[1]}**" for i, user in enumerate(vote_standings, start=1)])
     
     motm_announce_embed = discord.Embed(
@@ -376,15 +377,20 @@ async def edit_motm_role():
     
     await motm.remove_roles(motm_role)
     
-    count_votes()
     await bot.get_guild(gm_guild_id).get_member(vote_standings[0][0]).add_roles(motm_role)
   
-motm_month = (date.today().month) + 1
-first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=0)
+
 
 @tasks.loop(minutes=1)
 async def check_for_month():
+    motm_month = (date.today().month) + 1
+    first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=0)
     if datetime.now() >= first_of_month <= (datetime.now() + timedelta(minutes=1)):
+        count_votes()
+        if vote_standings[0][1] == vote_standings[1][1]:
+            if random.randint(1,2) == 2:
+                vote_standings[0],vote_standings[1] = vote_standings[1],vote_standings[0]
+                
         await edit_motm_role()
         await motm_announce()
         reset_voting()
@@ -534,5 +540,6 @@ async def sendmsg_error(ctx: discord.ApplicationContext, error: discord.DiscordE
         await ctx.respond("You do not have permission to use this command. (DEV ONLY)", ephemeral=True)
     else:
         raise error
+
 
 bot.run(TOKEN)
