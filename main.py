@@ -557,7 +557,7 @@ async def sendevent(ctx: discord.ApplicationContext, eventid: str):
     )
     event_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
     event_embed.set_image(url=event_details[9])
-    event_embed.set_footer(text=f"https://noterix.com/event?id={event_details[0]}\nEvent hosted with Noterix.com")
+    event_embed.set_footer(text=f"https://noterix.com/event?id={event_details[0]}\nPowered by Noterix.com")
     
     event_embed.add_field(
         name="Date",
@@ -619,7 +619,7 @@ async def addevent(ctx: discord.ApplicationContext, title: str, content: str, ev
         color=int("4540619")
     )
     event_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
-    event_embed.set_footer(text=f"https://noterix.com/event?id={event_id}\nEvent hosted with Noterix.com")
+    event_embed.set_footer(text=f"https://noterix.com/event?id={event_id}\nPowered by Noterix.com")
     
     event_embed.add_field(
         name="Date",
