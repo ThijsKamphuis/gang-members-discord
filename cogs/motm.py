@@ -26,7 +26,7 @@ GM_id = 882248832354750524
 class motm(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-      
+        
     @commands.Cog.listener()
     async def on_ready(self):
         self.refresh_MOTM.start()
