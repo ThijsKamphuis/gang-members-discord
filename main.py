@@ -28,7 +28,7 @@ GMStaff_id = 1067195296993517568
 GMAdmin_id = 882248427298230292
 GM_id = 882248832354750524
 
-#### STARTUP ###################################################
+#### STARTUP ####
 @bot.event
 async def on_connect():
     bot.load_extension("cogs.noterix")
@@ -44,7 +44,7 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="polish moments"))
 
 
-#### ON MEMBER JOIN ###################################################
+#### ON MEMBER JOIN ####
 @bot.event
 async def on_member_join(member):
     await member.add_roles(bot.get_guild(gm_guild_id).get_role(882251536653230151))
@@ -54,7 +54,7 @@ async def on_member_join(member):
     await bot.get_channel(882248303822123021).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
 
 
-#### SEND MESSAGE AS BOT ###################################################
+#### SEND MESSAGE AS BOT ####
 @bot.slash_command(label="sendmsg",description="(DEV ONLY)")
 @commands.has_any_role(GMDev_id)
 async def sendmsg(ctx: discord.ApplicationContext, channel: str, message: str):
