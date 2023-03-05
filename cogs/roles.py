@@ -20,6 +20,10 @@ class roles(commands.Cog):
     async def on_ready(self):
         self.bot.add_view(self.GameRoleSelectMenu())
         
+        global guild_object
+        guild_object = self.bot.get_guild(gm_guild_id)
+        
+        
     GameRole_embed = discord.Embed(
         title="Select your games",
         color=11439359,
@@ -75,19 +79,20 @@ class roles(commands.Cog):
             options= GameRolesList,
             custom_id = "ui.select:gameselectmenu"  
         )
-        async def SelectMenu_callback(self, select: discord.ui.Select, interaction: discord.Interaction):            
-            await interaction.response.send_message("Your roles have been updated", ephemeral= True, delete_after= 5)
-            roles_member = self.bot.get_guild(gm_guild_id).get_member(interaction.user.id)
+        async def SelectMenu_callback(self, select: discord.ui.Select, interaction: discord.Interaction):
+            roles_member = guild_object.get_member(interaction.user.id)
             for key in self.game_roles:
                 if key in select.values:
-                    await roles_member.add_roles(self.bot.get_guild(gm_guild_id).get_role(self.game_roles[key]))
+                    await roles_member.add_roles(guild_object.get_role(self.game_roles[key]))
                 else:
-                    await roles_member.remove_roles(self.bot.get_guild(gm_guild_id).get_role(self.game_roles[key]))
+                    await roles_member.remove_roles(guild_object.get_role(self.game_roles[key]))
                     
+            await interaction.response.send_message("Your roles have been updated", ephemeral= True, delete_after= 5)
+
 
     @commands.slash_command(label="gamerolesinit",description="Initialize game roles (STAFF ONLY)")
     @commands.has_any_role(GMDev_id, GMAdmin_id, GMStaff_id)
-    async def gamerolesinit(self, ctx: discord.ApplicationContextctx):
+    async def gamerolesinit(self, ctx: discord.ApplicationContext):
         await ctx.respond("Initializing")
         await self.bot.get_channel(self.channel_game_roles).send(embed = self.GameRole_embed, view = self.GameRoleSelectMenu())
 
