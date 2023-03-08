@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 from num2words import num2words
 
-#### SETUP ###################################################
+#### SETUP ####
 load_dotenv()
 
 #### BOT INIT ####
@@ -36,12 +36,12 @@ async def on_connect():
     bot.load_extension("cogs.quote")
     bot.load_extension("cogs.motm")
     bot.load_extension("cogs.roles")
+    bot.load_extension("cogs.activity")
     await bot.sync_commands()
 
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="polish moments"))
 
 
 #### ON MEMBER JOIN ####
@@ -52,21 +52,5 @@ async def on_member_join(member):
     member_count = bot.get_guild(gm_guild_id).member_count
     count_suffix = num2words(member_count, to='ordinal')[-2:]
     await bot.get_channel(882248303822123021).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
-
-
-#### SEND MESSAGE AS BOT ####
-@bot.slash_command(label="sendmsg",description="(DEV ONLY)")
-@commands.has_any_role(GMDev_id)
-async def sendmsg(ctx: discord.ApplicationContext, channel: str, message: str):
-    await ctx.respond("Sending", ephemeral = True)
-    await bot.get_channel(int(channel)).send(message)
-
-@sendmsg.error
-async def sendmsg_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
-    if isinstance(error, commands.MissingAnyRole):
-        await ctx.respond("You do not have permission to use this command. (DEV ONLY)", ephemeral=True)
-    else:
-        raise error
-
 
 bot.run(os.getenv('DISCORD_TOKEN'))
