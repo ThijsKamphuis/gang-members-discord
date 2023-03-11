@@ -40,6 +40,7 @@ async def on_connect():
     bot.load_extension("cogs.motm")
     bot.load_extension("cogs.roles")
     bot.load_extension("cogs.activity")
+    bot.load_extension("cogs.birthday")
     await bot.sync_commands()
 
 @bot.event
@@ -56,7 +57,7 @@ async def on_member_join(member):
     count_suffix = num2words(member_count, to='ordinal')[-2:]
     await bot.get_channel(882248303822123021).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
 
-
+#### DOWNLOAD ####
 @bot.slash_command(name="downloadpfps", description="download pfp of every member (STAFF ONLY)")
 @commands.has_any_role(GMStaff_id, GMAdmin_id)
 async def download_pfps(ctx):
