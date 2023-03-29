@@ -22,6 +22,7 @@ class birthday(commands.Cog):
             
         with open('databases/birthdays.json', 'w') as outfile:
                 json.dump(birthdaysdb, outfile, indent=4)
+        return
                 
       
     @commands.slash_command(name="birthdaylist", description="View upcoming birthdays.")
