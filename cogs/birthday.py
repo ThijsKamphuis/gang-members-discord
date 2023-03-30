@@ -1,8 +1,9 @@
 import discord
 from discord.ext import commands
+from discord.ext import tasks
 import discord.utils
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 gm_guild_id = 882248303822123018
@@ -11,6 +12,9 @@ class birthday(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.checkbirthday.start()
         
     @commands.slash_command(name="setbirthday", description="Add your birthday to the Gang Members calendar.")
     async def setbirthday(self, ctx: discord.ApplicationContext, day: int, month: int, year: int):
@@ -59,6 +63,29 @@ class birthday(commands.Cog):
           
         await ctx.respond(embed=birthdays_embed, ephemeral=True)
         
+    @tasks.loop(minutes=1)
+    async def checkbirthday(self):
+        
+        checktime = datetime(datetime.today().year, datetime.today().month, datetime.today().day, hour=0, minute=1)
+        
+        if (checktime <= datetime.now() <= (checktime + timedelta(minutes=1))):
+            birthdaysdb = json.load(open('databases/birthdays.json', encoding="utf-8"))
+            for birthday in birthdaysdb:
+                if (datetime.strptime(birthdaysdb[birthday], "%d-%m-%Y").day == datetime.today().day) and (datetime.strptime(birthdaysdb[birthday], "%d-%m-%Y").month == datetime.today().month):
+                    birthday_member = self.bot.get_guild(gm_guild_id).get_member(int(birthday))
+                    
+                    birthday_embed = discord.Embed(
+                        title=f"It's {birthday_member.name}'s birthday!",
+                        description= f"{birthday_member.name} turned {datetime.now().year - datetime.strptime(birthdaysdb[birthday][-4:], '%Y').year} today!",
+                        color=0xae8cff
+                    )
+                    birthday_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
+                    
+                    await self.bot.get_channel(882574276765564989).send("@everyone", embed= birthday_embed)
+                    
+                    
+            
+
         
 
 
