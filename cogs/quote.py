@@ -68,14 +68,14 @@ class quote(commands.Cog):
         self.bot = bot
         
     #### QUOTE RANDOM ####
-    @commands.slash_command(name="gmquote", description='Random Gang Member Quote')
+    @commands.slash_command(name="quote", description='Random Gang Member Quote')
     async def gmquote(self, ctx: discord.ApplicationContext):
         gm_quote = random.sample(json.load(open('databases/quotes.json', encoding="utf-8")), 1)[0]
         await ctx.respond(f'> {gm_quote["Quote"]}\n**~{gm_quote["Author"]}, {gm_quote["Year"]}**')
 
 
     #### QUOTE ADD ####
-    @commands.slash_command(name="gmquoteadd", description='Add a Gang Member Quote')
+    @commands.slash_command(name="quoteadd", description='Add a Gang Member Quote')
     async def gmquoteadd(self, ctx: discord.ApplicationContext, quote: str, author: str, year: int):     
         quotelist = json.load(open('databases/quotes.json', encoding="utf-8"))
         quotelist.append({"Quote":quote,"Author":author,"Year":year})
@@ -85,7 +85,7 @@ class quote(commands.Cog):
         await ctx.respond(f'> {quote}\n**~{author}, {year}**\n Quote successfully added!')
 
     #### QUOTE LIST ####
-    @commands.slash_command(name="gmquotelist", description='List all Gang Member Quotes')
+    @commands.slash_command(name="quotelist", description='List all Gang Member Quotes')
     async def gmquotelist(self, ctx: discord.ApplicationContext):
         get_quote_page(1)
         await ctx.respond(embed = quote_embed, view = QuoteButtonsView(), ephemeral=True)

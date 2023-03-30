@@ -26,11 +26,6 @@ class gifs(commands.Cog):
         await ctx.respond("https://tenor.com/view/manoe-gangmembers-gm-gif-27494707")
         return  
 
-    #### POLISH GIF ####
-    @commands.slash_command(name="polishmoment", description='Polish Moment')
-    async def polishgif(self, ctx: discord.ApplicationContext):
-        await ctx.respond("https://tenor.com/view/gif-27686219")
-        return  
 
         
 def setup(bot):

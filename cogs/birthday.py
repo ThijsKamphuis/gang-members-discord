@@ -12,8 +12,8 @@ class birthday(commands.Cog):
         self.bot = bot
         
         
-    @commands.slash_command(name="birthdayset", description="Add your birthday to the Gang Members calendar.")
-    async def birthdayset(self, ctx: discord.ApplicationContext, day: int, month: int, year: int):
+    @commands.slash_command(name="setbirthday", description="Add your birthday to the Gang Members calendar.")
+    async def setbirthday(self, ctx: discord.ApplicationContext, day: int, month: int, year: int):
         birthdaysdb = json.load(open('databases/birthdays.json', encoding="utf-8"))
         
         if datetime.strptime(f"{day:02d}-{month:02d}-{year}", "%d-%m-%Y"):
@@ -28,8 +28,8 @@ class birthday(commands.Cog):
                 
                 
 
-    @commands.slash_command(name="nextbirthday", description="View upcoming birthdays.")
-    async def nextbirthday(self, ctx: discord.ApplicationContext):
+    @commands.slash_command(name="nextbirthdays", description="View upcoming birthdays.")
+    async def nextbirthdays(self, ctx: discord.ApplicationContext):
         og_birthdaysdb = json.load(open('databases/birthdays.json', encoding="utf-8"))
 
         birthdays = {k: v[:-4] + str(datetime.now().year) for k, v in og_birthdaysdb.items()}
