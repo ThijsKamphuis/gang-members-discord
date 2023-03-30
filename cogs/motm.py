@@ -181,7 +181,7 @@ class motm(commands.Cog):
 
     #### MOTM STANDINGS ####
     @commands.slash_command(name="motmstandings", description="View MOTM standings (ADMIN ONLY)")
-    @commands.has_any_role(GMAdmin_id)
+    @commands.has_any_role(GMAdmin_id, GMDev_id)
     async def motmstandings(self, ctx: discord.ApplicationContext):
         await ctx.respond("\n".join([f"{i}. <@{user[0]}>: **{user[1]}**" for i, user in enumerate(motm.count_votes(self), start=1)]), ephemeral = True)
         
