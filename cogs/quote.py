@@ -54,11 +54,19 @@ class QuoteButtonsView(discord.ui.View):
         else:
             await interaction.response.edit_message(embed = quote_embed)
             
+    @discord.ui.button(label="Next", style=discord.ButtonStyle.primary, emoji="➡")
+    async def next(self, button: discord.ui.Button, interaction: discord.Interaction):
+        if current_page < total_pages:
+            get_quote_page((current_page + 1))
+            await interaction.response.edit_message(embed = quote_embed)
+        else:
+            await interaction.response.edit_message(embed = quote_embed)
+            
+        
 class quote(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         
-
     #### QUOTE RANDOM ####
     @commands.slash_command(name="gmquote", description='Random Gang Member Quote')
     async def gmquote(self, ctx: discord.ApplicationContext):
@@ -77,17 +85,6 @@ class quote(commands.Cog):
         await ctx.respond(f'> {quote}\n**~{author}, {year}**\n Quote successfully added!')
 
     #### QUOTE LIST ####
-
-
-        @discord.ui.button(label="Next", style=discord.ButtonStyle.primary, emoji="➡")
-        async def next(self, button: discord.ui.Button, interaction: discord.Interaction):
-            if current_page < total_pages:
-                get_quote_page((current_page + 1))
-                await interaction.response.edit_message(embed = quote_embed)
-            else:
-                await interaction.response.edit_message(embed = quote_embed)
-
-
     @commands.slash_command(name="gmquotelist", description='List all Gang Member Quotes')
     async def gmquotelist(self, ctx: discord.ApplicationContext):
         get_quote_page(1)
