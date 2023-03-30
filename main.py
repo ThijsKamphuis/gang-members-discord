@@ -46,6 +46,7 @@ async def on_connect():
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
+    bot.get_guild(gm_guild_id).get_member(1059183824749199380).edit(nick=None)
 
 
 #### ON MEMBER JOIN ####
