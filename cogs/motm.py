@@ -204,7 +204,7 @@ class motm(commands.Cog):
             
     #### ANNOUNCE MOTM ####       
     async def motm_announce(self):
-        motmuser = motm.get_motm()
+        motmuser = motm.get_motm(self)
         
         
         standings_list = "\n".join([f"{i}. <@{user[0]}>: **{user[1]}**" for i, user in enumerate(vote_standings, start=1)])
@@ -234,7 +234,7 @@ class motm(commands.Cog):
         
     #### EDIT MOTM ROLE ####
     async def edit_motm_role(self):
-        motmuser = motm.get_motm()
+        motmuser = motm.get_motm(self)
         motm_role = self.bot.get_guild(gm_guild_id).get_role(motm_role_id)
         
         await motmuser.remove_roles(motm_role)
@@ -246,7 +246,7 @@ class motm(commands.Cog):
     async def check_for_month(self):
 
         motm_month = (date.today().month)
-        first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=10)
+        first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=13)
         
         if (first_of_month <= datetime.now() <= (first_of_month + timedelta(minutes=1))):
             self.count_votes()
