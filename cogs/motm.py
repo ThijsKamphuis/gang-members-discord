@@ -246,7 +246,7 @@ class motm(commands.Cog):
     async def check_for_month(self):
 
         motm_month = (date.today().month)
-        first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=17)
+        first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=1)
         
         if (first_of_month <= datetime.now() <= (first_of_month + timedelta(minutes=1))):
             self.count_votes()
@@ -256,8 +256,10 @@ class motm(commands.Cog):
                     
             await self.edit_motm_role()
             await self.motm_announce()
-            self.reset_voting()
+            motm.reset_voting()
             await self.refresh_MOTM()
-        
+
+motm.reset_voting()
+      
 def setup(bot):
     bot.add_cog(motm(bot))
