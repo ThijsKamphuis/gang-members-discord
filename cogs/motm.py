@@ -219,7 +219,7 @@ class motm(commands.Cog):
         
         motm_announce_embed.add_field(
             name=f"Our new Member of the month is {motmuser.display_name}!",
-            value=f"<@{motm.id}> won with {vote_standings[0][1]} votes.",
+            value=f"<@{motmuser.id}> won with {vote_standings[0][1]} votes.",
             inline=False
         )
         
@@ -246,7 +246,7 @@ class motm(commands.Cog):
     async def check_for_month(self):
 
         motm_month = (date.today().month)
-        first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=15)
+        first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=17)
         
         if (first_of_month <= datetime.now() <= (first_of_month + timedelta(minutes=1))):
             self.count_votes()
