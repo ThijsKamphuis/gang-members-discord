@@ -211,7 +211,7 @@ class motm(commands.Cog):
         
         motm_announce_embed = discord.Embed(
             title="New Member of the Month",
-            color=motm.color
+            color=motmuser.color
         )
 
         motm_announce_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
@@ -246,7 +246,7 @@ class motm(commands.Cog):
     async def check_for_month(self):
 
         motm_month = (date.today().month)
-        first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=13)
+        first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=15)
         
         if (first_of_month <= datetime.now() <= (first_of_month + timedelta(minutes=1))):
             self.count_votes()
