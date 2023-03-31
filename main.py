@@ -56,7 +56,10 @@ async def on_member_join(member):
     await member.add_roles(bot.get_guild(gm_guild_id).get_role(882251536653230151))
     member_count = bot.get_guild(gm_guild_id).member_count
     count_suffix = num2words(member_count, to='ordinal')[-2:]
-    await bot.get_channel(882248303822123021).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
+    if (member_count % 100) == 0:
+        await bot.get_channel(882248303822123021).send(f"Congratulations <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join!!!!!!")
+    else:
+        await bot.get_channel(882248303822123021).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
 
 
 async def download_pfps():
