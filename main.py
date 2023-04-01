@@ -63,15 +63,15 @@ async def on_member_join(member):
         await bot.get_channel(882248303822123021).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
 
 @bot.event
-async def on_member_remove(member):
+async def on_member_remove(member):    
     birthdaysdb = json.load(open('databases/birthdays.json', encoding="utf-8"))
-    if member.id in birthdaysdb.keys():
-        del birthdaysdb[member.id]
+    if str(member.id) in birthdaysdb.keys():
+        birthdaysdb.pop(str(member.id))
     
     motmvotesdb = json.load(open('databases/motm_votes.json', encoding="utf-8"))
     for vote in motmvotesdb:
-        if member.id in vote["Vote"] or member.id in vote["User"]:
-            del motmvotesdb[vote]
+        if str(member.id) in vote["Vote"] or str(member.id) in vote["User"]:
+            motmvotesdb.remove(vote)
         
     with open('databases/birthdays.json', 'w') as outfile:
         json.dump(birthdaysdb, outfile, indent=4)
