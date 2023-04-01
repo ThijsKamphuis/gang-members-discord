@@ -258,8 +258,6 @@ class motm(commands.Cog):
             await self.motm_announce()
             motm.reset_voting()
             await self.refresh_MOTM()
-
-motm.reset_voting()
       
 def setup(bot):
     bot.add_cog(motm(bot))
