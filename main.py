@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from num2words import num2words
 import requests
+import json
 
 
 #### SETUP ####
@@ -61,6 +62,21 @@ async def on_member_join(member):
     else:
         await bot.get_channel(882248303822123021).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
 
+@bot.event
+async def on_member_remove(member):
+    birthdaysdb = json.load(open('databases/birthdays.json', encoding="utf-8"))
+    if member.id in birthdaysdb.keys():
+        del birthdaysdb[member.id]
+    
+    motmvotesdb = json.load(open('databases/motm_votes.json', encoding="utf-8"))
+    for vote in motmvotesdb:
+        if member.id in vote["Vote"] or member.id in vote["User"]:
+            del motmvotesdb[vote]
+        
+    with open('databases/birthdays.json', 'w') as outfile:
+        json.dump(birthdaysdb, outfile, indent=4)
+    with open('databases/motm_votes.json', 'w') as outfile:
+        json.dump(motmvotesdb, outfile, indent=4)
 
 async def download_pfps():
     for member in (bot.get_guild(gm_guild_id).members):
