@@ -29,7 +29,7 @@ class gifs(commands.Cog):
     #### MANOE GIF ####
     @commands.slash_command(name="bram", description='BRAM')
     async def bramgif(self, ctx: discord.ApplicationContext):
-        await ctx.respond("https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGVmMTk5NTBlNTJhZTljYmFiMzE4MmI1NzM3ODg3MmI4MmM1NmZmOSZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/cNQk899GiHffdtF4m9/giphy.gif")
+        await ctx.respond("https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExODhhZmI4MDRhN2JlNzFmOGUzYmFkYWFiZWFiYzY2NjMxODU1Nzg1YyZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/4tFyr7OuPTtPC1VFve/giphy.gif")
         return   
 
 
