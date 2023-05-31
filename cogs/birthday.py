@@ -81,7 +81,7 @@ class birthday(commands.Cog):
                     )
                     birthday_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
                     
-                    await self.bot.get_channel(882574276765564989).send("@everyone", embed= birthday_embed)
+                    await self.bot.get_channel(882252560608657408).send("@everyone", embed= birthday_embed)
                     
                     
             

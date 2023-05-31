@@ -75,7 +75,8 @@ class quote(commands.Cog):
 
 
     #### QUOTE ADD ####
-    @commands.slash_command(name="quoteadd", description='Add a Gang Member Quote')
+    @commands.slash_command(name="quoteadd", description='Add a Gang Member Quote(GM Only)')
+    @commands.has_any_role(882248832354750524)
     async def gmquoteadd(self, ctx: discord.ApplicationContext, quote: str, author: str, year: int):     
         quotelist = json.load(open('databases/quotes.json', encoding="utf-8"))
         quotelist.append({"Quote":quote,"Author":author,"Year":year})
