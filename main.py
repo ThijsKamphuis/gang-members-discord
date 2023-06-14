@@ -35,11 +35,9 @@ GM_id = 882248832354750524
 #### STARTUP ####
 @bot.event
 async def on_connect():
-    bot.load_extension("cogs.noterix")
     bot.load_extension("cogs.gifs")
     bot.load_extension("cogs.quote")
     bot.load_extension("cogs.motm")
-    bot.load_extension("cogs.roles")
     bot.load_extension("cogs.activity")
     bot.load_extension("cogs.birthday")
     await bot.sync_commands()
