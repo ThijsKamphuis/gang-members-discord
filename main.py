@@ -1,12 +1,13 @@
-from unicodedata import name
+import asyncio
+from distutils.command import upload
 import discord
-from discord.ext import commands
 import discord.utils
 import os
 from dotenv import load_dotenv
 from num2words import num2words
 import requests
 import json
+import mysql.connector
 
 
 #### SETUP ####
@@ -48,7 +49,6 @@ async def on_ready():
     
     #await bot.get_guild(gm_guild_id).get_member(1059183824749199380).edit(nick=None)
 
-
 #### ON MEMBER JOIN ####
 @bot.event
 async def on_member_join(member):
@@ -59,7 +59,9 @@ async def on_member_join(member):
         await bot.get_channel(882248303822123021).send(f"Congratulations <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join!!!!!!")
     else:
         await bot.get_channel(882248303822123021).send(f"Hello <@{member.id}>, welcome to Gang Members. You are the {member_count}{count_suffix} member to join.")
-
+    download_user_pfp(member)
+    
+    
 @bot.event
 async def on_member_remove(member):    
     birthdaysdb = json.load(open('databases/birthdays.json', encoding="utf-8"))
@@ -75,10 +77,59 @@ async def on_member_remove(member):
         json.dump(birthdaysdb, outfile, indent=4)
     with open('databases/motm_votes.json', 'w') as outfile:
         json.dump(motmvotesdb, outfile, indent=4)
+        
+    os.remove(f"profilepics/{member.name}.png")
+        
 
-async def download_pfps():
+def download_all_pfps():
     for member in (bot.get_guild(gm_guild_id).members):
-        print(member)
+        print(member.name)
+        if member.avatar == None:
+            open(f"profilepics/{member.name}.png", "wb").write(requests.get(member.display_avatar.url, allow_redirects=True).content)
+        else:
+            open(f"profilepics/{member.name}.png", "wb").write(requests.get(member.avatar.url, allow_redirects=True).content)      
+
+        
+
+def download_user_pfp(member):
+    if member.avatar == None:
         open(f"profilepics/{member.name}.png", "wb").write(requests.get(member.display_avatar.url, allow_redirects=True).content)
-                
+    else:
+        open(f"profilepics/{member.name}.png", "wb").write(requests.get(member.avatar.url, allow_redirects=True).content)
+              
+################ SQL ###############
+GM_db = mysql.connector.connect(
+    host= os.getenv('SQL_HOST'),
+    user= os.getenv('SQL_USER'),
+    password= os.getenv('SQL_PASS'),
+    database= os.getenv('SQL_DB')
+    )             
+GM_db_cursor = GM_db.cursor()
+
+memberlist = []
+
+def get_all_members():
+
+    for member in (bot.get_guild(gm_guild_id).members):
+        memberinfo = {
+            "username": member.name,
+            "userid": member.id,
+            "role": member.top_role.name,
+            "avatarurl": f"https://gangmembers.eu/img/discord_upload/profilepics/{member.name}.png"
+        }
+        memberlist.append(memberinfo)
+    
+    print(memberlist)
+        
+def upload_members():
+    for member in memberlist:
+        sql = f"INSERT INTO discord_users(userid, username, role, avatarurl) VALUES ({member['userid']}, '{member['username']}', '{member['role']}', '{member['avatarurl']}')"
+        GM_db_cursor.execute(sql)
+    GM_db.commit()
+    GM_db.close()
+
+
+
+
+               
 bot.run(os.getenv('DISCORD_TOKEN'))
