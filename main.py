@@ -209,7 +209,10 @@ def upload_member(member):
     send_sql(f"INSERT INTO discord_users(userid, username, rank, roles, avatarurl) VALUES ({parse_sql(member.id)}, '{parse_sql(member.name)}', '{parse_sql(rank)}', '{parse_sql(roles)}', '{parse_sql(f'https://gangmembers.eu/img/discord_upload/profilepics/{member.name}.png')}')")
     print(f"Uploaded {member.name}") 
       
-def update_member(member):  
+def update_member(member):
+    
+    member = bot.get_guild(gm_guild_id).get_member(member.id)
+     
     rank, roles = format_roles(member)
     send_sql(f"UPDATE discord_users SET username = '{parse_sql(member.name)}', rank = '{parse_sql(rank)}', roles = '{parse_sql(roles)}', avatarurl = '{parse_sql(f'https://gangmembers.eu/img/discord_upload/profilepics/{member.name}.png')}' WHERE userid = '{parse_sql(member.id)}'") 
     print(f"Updated {member.name}")
