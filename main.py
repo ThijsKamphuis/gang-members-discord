@@ -8,8 +8,6 @@ import json
 import mysql.connector
 import paramiko
 
-from cogs.old.roles import roles
-
 #### SETUP ####
 load_dotenv()
 
