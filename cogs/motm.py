@@ -155,6 +155,7 @@ class motm(commands.Cog):
                 if voter == user:
                     await ctx.respond("You can't vote on yourself", ephemeral=True)
                     await self.bot.get_channel(882251873686519828).send(f"L bozo <@{ctx.author.id}> tried to vote on themselves")
+                else:
                     motm_votes_db = json.load(open('databases/motm_votes.json', encoding="utf-8"))
                     if not any(d["User"] == voter for d in motm_votes_db):
                         motm_votes_db.append({"Vote":user,"User":voter})
