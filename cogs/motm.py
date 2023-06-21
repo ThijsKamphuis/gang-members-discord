@@ -152,15 +152,18 @@ class motm(commands.Cog):
             if (GMadmin_role in user_model.roles):
                 await ctx.respond("Chosen user is an Admin", ephemeral=True)
             else:
-                motm_votes_db = json.load(open('databases/motm_votes.json', encoding="utf-8"))
-                if not any(d["User"] == voter for d in motm_votes_db):
-                    motm_votes_db.append({"Vote":user,"User":voter})
-                    with open('databases/motm_votes.json', 'w') as outfile:
-                        json.dump(motm_votes_db, outfile, indent=4)
+                if voter == user:
+                    await ctx.respond("You can't vote on yourself", ephemeral=True)
+                    await self.bot.get_channel(882251873686519828).send(f"L bozo <@{ctx.author.id}> tried to vote on themselves")
+                    motm_votes_db = json.load(open('databases/motm_votes.json', encoding="utf-8"))
+                    if not any(d["User"] == voter for d in motm_votes_db):
+                        motm_votes_db.append({"Vote":user,"User":voter})
+                        with open('databases/motm_votes.json', 'w') as outfile:
+                            json.dump(motm_votes_db, outfile, indent=4)
 
-                    await ctx.respond(f"You voted for <@{user}>.", ephemeral=True)
-                else:
-                    await ctx.respond("You already voted", ephemeral=True)
+                        await ctx.respond(f"You voted for <@{user}>.", ephemeral=True)
+                    else:
+                        await ctx.respond("You already voted", ephemeral=True)
         else:
             await ctx.respond("Chosen user is not a GangMember", ephemeral=True)
         
