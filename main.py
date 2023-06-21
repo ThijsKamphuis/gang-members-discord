@@ -8,10 +8,10 @@ import json
 import mysql.connector
 import paramiko
 
-#### SETUP ####
+#### SETUP ##################################################################
 load_dotenv()
 
-#### BOT INIT ####
+#### BOT INIT ###############################################################
 class GangMemberBot(discord.Bot):
     def __init__(self):
         intents = discord.Intents.all()
@@ -20,7 +20,7 @@ class GangMemberBot(discord.Bot):
     
 bot = GangMemberBot()
 
-#### IDS ####
+#### IDS ####################################################################
 gm_guild_id = 882248303822123018
 
 motm_channel_id = 1065028419487793182
@@ -53,7 +53,7 @@ special_roles = [
     1100852249187594260, #Background NPC
 ]
 
-#### STARTUP ####
+#### STARTUP ###############################################################
 @bot.event
 async def on_connect():
     bot.load_extension("cogs.gifs")
@@ -70,7 +70,7 @@ async def on_ready():
 
 
 
-#### ON MEMBER JOIN ####
+#### ON MEMBER JOIN #########################################################
 @bot.event
 async def on_member_join(member):
     await member.add_roles(bot.get_guild(gm_guild_id).get_role(882251536653230151))
@@ -84,7 +84,7 @@ async def on_member_join(member):
     upload_user_pfp(member)
     upload_member(member)
     
-#### ON MEMBER LEAVE ####
+#### ON MEMBER LEAVE ############################################################
 @bot.event
 async def on_member_remove(member):    
     birthdaysdb = json.load(open('databases/birthdays.json', encoding="utf-8"))
@@ -107,7 +107,7 @@ async def on_member_remove(member):
 
 
 
-#### AUTO UPDATE DATABASES #### 
+#### AUTO UPDATE DATABASES #########################################################
 @bot.event
 async def on_member_update(before, after):
     download_user_pfp(after)
@@ -127,7 +127,7 @@ async def on_guild_role_update(before, after):
 
 
    
-#### PROFILE PICS ####
+#### PROFILE PICS ######################################################################
 def download_all_pfps():
     for member in (bot.get_guild(gm_guild_id).members):
         print(member.name)
@@ -175,7 +175,7 @@ def open_sftp():
     return GM_sftp, transport
      
      
-#### MEMBERS SQL ####
+#### MEMBERS SQL ########################################################################
 memberlist = []
 
 def get_all_members():
@@ -271,6 +271,12 @@ def send_sql(sql):
     GM_db_cursor.execute(sql)
     GM_db.commit()
     GM_db.close()
+
+
+
+
+
+
 
 
 
