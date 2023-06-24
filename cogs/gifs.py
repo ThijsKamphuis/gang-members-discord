@@ -7,12 +7,6 @@ import json
 class gifs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
-    #### 727 GIF ####
-    @commands.slash_command(name="727", description='727?')
-    async def gif727(self, ctx: discord.ApplicationContext):
-        await ctx.respond(random.sample(json.load(open('databases/gifs.json', encoding="utf-8")), 1)[0])
-        return    
 
     #### JORN GIF ####
     @commands.slash_command(name="vallas", description='JORN (VALLAS)')

@@ -1,4 +1,3 @@
-from itertools import count
 import discord
 from discord.ext import commands
 from discord.ext import tasks
@@ -7,7 +6,6 @@ import json
 import random
 from datetime import datetime, date, timedelta
 from dateutil import relativedelta
-from collections import defaultdict
 from re import sub
 from dotenv import load_dotenv
 import os
@@ -25,6 +23,15 @@ GMAdmin_id = 882248427298230292
 GM_id = 882248832354750524
 
 load_dotenv()
+
+
+####### TO DO
+#- get previous year in first month count votes
+
+
+
+
+
 
 class motm(commands.Cog):
     def __init__(self, bot):
@@ -46,7 +53,6 @@ class motm(commands.Cog):
 
     #### COUNT VOTES ####
     def count_votes(self, month, year):
-        global vote_standings
         # GET ALL VOTES FROM DB IN SELECTED MONTH
         motm_vote_count = send_sql(f"SELECT voted_userid, COUNT(*) AS 'votes' FROM motm_votes WHERE month='{str(month).zfill(2)}' AND year='{year}' GROUP BY voted_userid ORDER BY votes DESC")
         # RETURN LIST OF TUPLES [(userid, count)]
@@ -55,7 +61,7 @@ class motm(commands.Cog):
         
 
 
-    #### GENERATE EMBED ####
+    #### GENERATE EMBED MOTM ####
     def motm_embed_gen(self):
         motm = self.get_motm()
         global motm_embed
@@ -64,7 +70,7 @@ class motm(commands.Cog):
             color=motm.color
         )
 
-        motm_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
+        motm_embed.set_thumbnail(url="https://gangmembers.eu/img/favicon/android-chrome-512x512.png")
         motm_embed.set_image(url=motm.display_avatar.url)
         motm_embed.add_field(
             name="Current MotM:",
@@ -82,15 +88,14 @@ class motm(commands.Cog):
 
 
 
-    #### EDIT EMBED ####
+    #### EDIT EMBED MOTM ####
     async def edit_embed(self):
         self.motm_embed_gen()
         
-        motm_db = json.load(open('databases/motm.json', encoding="utf-8"))
-        motm_db_ID = motm_db[0]["MOTM_Message_ID"]
+        motm_message_id = send_sql(f"SELECT message_id FROM motm_data")[0][0]
         
         ch = self.bot.get_channel(motm_channel_id)  
-        msg = await ch.fetch_message(motm_db_ID)
+        msg = await ch.fetch_message(motm_message_id)
         await msg.edit(embed= motm_embed)
         return
         
@@ -109,11 +114,8 @@ class motm(commands.Cog):
         ch = self.bot.get_channel(motm_channel_id)
         await ch.purge()
         motm_message = await ch.send(embed= motm_embed)
-        
-        motm_db = json.load(open('databases/motm.json', encoding="utf-8"))
-        motm_db[0]["MOTM_Message_ID"] = motm_message.id
-        with open('databases/motm.json', 'w') as outfile:
-            json.dump(motm_db, outfile, indent=4)
+
+        send_sql(f"UPDATE motm_data SET message_id='{motm_message.id}'")
         
 
     @motminit.error
@@ -126,20 +128,18 @@ class motm(commands.Cog):
 
 
 
-    #### DEL EMBED ####
+    #### DEL EMBED MOTM ####
     @commands.slash_command(name="motmdel", description="Purge MOTM channel (DEV ONLY)")
     @commands.has_any_role(GMDev_id)
     async def motmdel(self, ctx: discord.ApplicationContext):
 
         ch = self.bot.get_channel(motm_channel_id)
 
-        await ctx.respond("Purging", ephemeral=True)
+        await ctx.respond("Purging...", ephemeral=True)
         await ch.purge()
         
-        motm_db = json.load(open('databases/motm.json', encoding="utf-8"))
-        motm_db[0]["MOTM_Message_ID"] = "0"
-        with open('databases/motm.json', 'w') as outfile:
-            json.dump(motm_db, outfile, indent=4)
+        send_sql(f"UPDATE motm_data SET message_id='0'")
+
 
 
     @tasks.loop(hours=1.0)
@@ -214,26 +214,22 @@ class motm(commands.Cog):
             raise error     
     
     
-    
-    
-    
-       
-    #### RESET VOTES ####
-    def reset_voting():
-
-        archive_file_name = f"votes_{datetime.now().month}_{datetime.now().year}"
-        
-        open(f"archive/{archive_file_name}.json", "w").write(open("databases/motm_votes.json").read())
-        
-        with open('databases/motm_votes.json', 'w') as outfile:
-            json.dump([], outfile, indent=4)
             
     #### ANNOUNCE MOTM ####       
     async def motm_announce(self):
         motmuser = motm.get_motm(self)
         
+        prev_month = datetime.now().month - 1
+        if prev_month == 0:
+            prev_month = 12
+            year = datetime.now().year - 1
+        else:
+            year = datetime.now().year
+                
+        motm_vote_count = self.count_votes(prev_month, year)
         
-        standings_list = "\n".join([f"{i}. <@{user[0]}>: **{user[1]}**" for i, user in enumerate(vote_standings, start=1)])
+        
+        standings_list = "\n".join([f"{i}. <@{user[0]}>: **{user[1]}**" for i, user in enumerate(motm_vote_count, start=1)])
         
         motm_announce_embed = discord.Embed(
             title="New Member of the Month",
@@ -241,11 +237,11 @@ class motm(commands.Cog):
         )
 
         motm_announce_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
-        motm_announce_embed.set_image(url=motmuser.display_avatar.url)
+        motm_announce_embed.set_image(url=motmuser.avatar.url)
         
         motm_announce_embed.add_field(
-            name=f"Our new Member of the month is {motmuser.display_name}!",
-            value=f"<@{motmuser.id}> won with {vote_standings[0][1]} votes.",
+            name="Our new Member of the month is:",
+            value=f"<@{motmuser.id}>!! They won with {motm_vote_count[0][1]} votes.",
             inline=False
         )
         
@@ -257,34 +253,41 @@ class motm(commands.Cog):
         )
         
         await self.bot.get_channel(882252560608657408).send(embed= motm_announce_embed)
+     
+     
         
     #### EDIT MOTM ROLE ####
     async def edit_motm_role(self):
         motmuser = motm.get_motm(self)
         motm_role = self.bot.get_guild(gm_guild_id).get_role(motm_role_id)
         
+        motm_vote_count = self.count_votes((datetime.now().month - relativedelta(months=1)), datetime.now().year)
+        
         await motmuser.remove_roles(motm_role)
-        await self.bot.get_guild(gm_guild_id).get_member(int(vote_standings[0][0])).add_roles(motm_role)
+        await self.bot.get_guild(gm_guild_id).get_member(int(motm_vote_count[0][0])).add_roles(motm_role)
     
 
     #### CHECK FOR NEW MONTH ####
     @tasks.loop(minutes=1)
     async def check_for_month(self):
-
-        motm_month = (date.today().month)
-        first_of_month = datetime(date.today().year, motm_month, 1, hour=0, minute=1)
-        
+        # FIRST MINUTE OF FIRST DAY OF MONTH
+        first_of_month = datetime(date.today().year, date.today().month, 1, hour=0, minute=1)
+        # CHECK IF IN FIRST OF MONTH
         if (first_of_month <= datetime.now() <= (first_of_month + timedelta(minutes=1))):
-            self.count_votes()
-            if vote_standings[0][1] == vote_standings[1][1]:
+            # COUNT VOTES
+            motm_vote_count = self.count_votes((datetime.now().month - relativedelta(months=1)), datetime.now().year)
+            # IF TOP 2 TIED
+            if motm_vote_count[0][1] == motm_vote_count[1][1]:
+                # COINFLIP
                 if random.randint(1,2) == 2:
-                    vote_standings[0],vote_standings[1] = vote_standings[1],vote_standings[0]
+                    motm_vote_count[0],motm_vote_count[1] = motm_vote_count[1],motm_vote_count[0]
                     
             await self.edit_motm_role()
             await self.motm_announce()
-            motm.reset_voting()
             await self.refresh_MOTM()
             
+ 
+ 
             
             
 def parse_sql(data):

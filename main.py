@@ -4,9 +4,11 @@ import os
 from dotenv import load_dotenv
 from num2words import num2words
 import requests
-import json
 import mysql.connector
 import paramiko
+from datetime import datetime
+from re import sub
+
 
 #### SETUP ##################################################################
 load_dotenv()
@@ -66,6 +68,12 @@ async def on_connect():
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
+    print()
+
+    # GET ACTIVE INVITES
+    global invites
+    invites = await bot.get_guild(gm_guild_id).invites()
+ 
 
 
 
@@ -83,46 +91,73 @@ async def on_member_join(member):
     download_user_pfp(member)
     upload_user_pfp(member)
     upload_member(member)
+    print()
+    
+    #GET INVITE USED
+    global invites
+    old_invites = invites
+    new_invites = await bot.get_guild(gm_guild_id).invites()
+    
+    for invite in new_invites:
+        if invite.uses != old_invites[new_invites.index(invite)].uses:
+            print(f"{member.name} joined using invite code: {invite.code}")
+            print(f"Invite made by: {invite.inviter.name}")
+            
+            #### SEND TO DB
+            send_sql(f"UPDATE discord_users SET invitecode='{invite.code}', inviter='{invite.inviter.name}' WHERE userid='{member.id}'")
+            print("\n")
+            
+    invites = await bot.get_guild(gm_guild_id).invites()
     
 #### ON MEMBER LEAVE ############################################################
 @bot.event
-async def on_member_remove(member):    
-    birthdaysdb = json.load(open('databases/birthdays.json', encoding="utf-8"))
-    if str(member.id) in birthdaysdb.keys():
-        birthdaysdb.pop(str(member.id))
-    
-    motmvotesdb = json.load(open('databases/motm_votes.json', encoding="utf-8"))
-    for vote in motmvotesdb:
-        if str(member.id) in vote["Vote"] or str(member.id) in vote["User"]:
-            motmvotesdb.remove(vote)
-        
-    with open('databases/birthdays.json', 'w') as outfile:
-        json.dump(birthdaysdb, outfile, indent=4)
-    with open('databases/motm_votes.json', 'w') as outfile:
-        json.dump(motmvotesdb, outfile, indent=4)
+async def on_member_remove(member):
+    # REMOVE CURRENT VOTE
+    send_sql(f"DELETE FROM motm_votes WHERE userid='{member.id}' AND month='{datetime.now().month}' AND year='{datetime.now().year}'")
         
     os.remove(f"profilepics/{member.name}.png")
     delete_user_pfp(member)
     delete_member(member)
+    print()
+
+
+
 
 
 
 #### AUTO UPDATE DATABASES #########################################################
+# MEMBER UPDATE
 @bot.event
 async def on_member_update(before, after):
     print("MEMBER UPDATE TRIGGERED")
     download_user_pfp(after)
     upload_user_pfp(after) 
     update_member(after)
-  
+    print()
+
+# USER UPDATE
+@bot.event
+async def on_user_update(before, after):
+    print("USER UPDATE TRIGGERED")
+    download_user_pfp(after)
+    upload_user_pfp(after) 
+    update_member(after)
+    delete_user_pfp(before)
+    print()
+
+# ROLE UPDATE
 @bot.event
 async def on_guild_role_update(before, after):
     print("ROLE UPDATE TRIGGERED")
     for member in bot.get_guild(gm_guild_id).get_role(after.id).members:
         update_member(member)
+    print()
 
 
-   
+
+
+
+
 #### PROFILE PICS ######################################################################
 def download_all_pfps():
     for member in (bot.get_guild(gm_guild_id).members):
@@ -155,7 +190,7 @@ def upload_user_pfp(member):
     GM_sftp.put(f"profilepics/{member.name}.png", f"img/discord_upload/profilepics/{member.name}.png")
     transport.close()
     print(f"Uploaded {member.name}.png")
-
+    
 def delete_user_pfp(member):
     GM_sftp, transport = open_sftp()
     
@@ -170,8 +205,11 @@ def open_sftp():
     GM_sftp = paramiko.SFTPClient.from_transport(transport)    
     return GM_sftp, transport
      
-     
-#### MEMBERS SQL ########################################################################
+
+
+
+   
+#### MEMBERS ########################################################################
 memberlist = []
 
 def get_all_members():
@@ -187,7 +225,7 @@ def get_all_members():
         }
         memberlist.append(memberinfo)
     print("Fetched all members")
-        
+    
 def upload_all_members():
     for member in memberlist:
         send_sql(f"INSERT INTO discord_users(userid, username, rank, roles, avatarurl) VALUES ({parse_sql(member['userid'])}, '{parse_sql(member['username'])}', '{parse_sql(member['rank'])}', '{parse_sql(member['roles'])}', '{parse_sql(member['avatarurl'])}')")
@@ -197,28 +235,22 @@ def update_all_members():
     for member in memberlist:
         send_sql(f"UPDATE discord_users SET username = '{parse_sql(member['username'])}', rank = '{parse_sql(member['rank'])}', roles = '{parse_sql(member['roles'])}', avatarurl = '{parse_sql(member['avatarurl'])}' WHERE userid = {parse_sql(member['userid'])}")
     print("Updated all members")
-        
+    
 def upload_member(member):
     rank, roles = format_roles(member)
     send_sql(f"INSERT INTO discord_users(userid, username, rank, roles, avatarurl) VALUES ({parse_sql(member.id)}, '{parse_sql(member.name)}', '{parse_sql(rank)}', '{parse_sql(roles)}', '{parse_sql(f'https://gangmembers.eu/img/discord_upload/profilepics/{member.name}.png')}')")
-    print(f"Uploaded {member.name}") 
-      
+    print(f"Uploaded {member.name} ({member.id})") 
 def update_member(member):
     
     member = bot.get_guild(gm_guild_id).get_member(member.id)
      
     rank, roles = format_roles(member)
     send_sql(f"UPDATE discord_users SET username = '{parse_sql(member.name)}', rank = '{parse_sql(rank)}', roles = '{parse_sql(roles)}', avatarurl = '{parse_sql(f'https://gangmembers.eu/img/discord_upload/profilepics/{member.name}.png')}' WHERE userid = '{parse_sql(member.id)}'") 
-    print(f"Updated {member.name}")
+    print(f"Updated {member.name} ({member.id})")
     
 def delete_member(member): 
     send_sql(f"DELETE FROM discord_users WHERE userid='{parse_sql(member.id)}'")
-    print(f"Deleted {member.id}")
-
-
-
-
-
+    print(f"Deleted {member.name} ({member.id})")
 
 
 def format_roles(member):
@@ -247,6 +279,47 @@ def format_roles(member):
     return rank, roles
 
 
+info_columns = [
+    "userid",
+    "username",
+    "rank",
+    "roles",
+    "birthday",
+    "invitecode",
+    "inviter",
+    "avatarurl"
+]
+
+
+@bot.slash_command(name="userinfo", description="Get user info (STAFF ONLY)")
+async def userinfo(ctx: discord.ApplicationContext, user: str):
+    member = bot.get_guild(gm_guild_id).get_member(int(sub("[<,>,@]", "", str(user))))
+    memberinfo = send_sql(f"SELECT * FROM discord_users WHERE userid='{member.id}'")[0]
+    
+    embed = discord.Embed(
+        title=f"{member.name} ({member.display_name})",
+        color= member.color
+    )
+
+    embed.set_image(url=memberinfo[-1])
+    embed.set_thumbnail(url="https://gangmembers.eu/img/favicon/android-chrome-512x512.png")
+    
+    for info in memberinfo:
+        if info:
+            embed.add_field(
+                name= info_columns[int(memberinfo.index(info))],
+                value= info,
+                inline=False
+            )
+    await ctx.respond(embed=embed, ephemeral=True)
+
+
+
+
+
+
+
+#### FUNCTIONS #############################################################
 def parse_sql(data):
     data = str(data).replace('&', "&#38") #Check &
     data = str(data).replace("'", "&#39") #Check '
@@ -269,10 +342,6 @@ def send_sql(sql):
     GM_db.commit()
     GM_db.close()
     return result
-
-
-
-
 
 
 

@@ -4,6 +4,8 @@ from discord.ext import tasks
 import discord.utils
 import json
 from datetime import datetime, timedelta
+import os
+import mysql.connector
 
 
 gm_guild_id = 882248303822123018
@@ -18,18 +20,23 @@ class birthday(commands.Cog):
         
     @commands.slash_command(name="setbirthday", description="Add your birthday to the Gang Members calendar.")
     async def setbirthday(self, ctx: discord.ApplicationContext, day: int, month: int, year: int):
-        birthdaysdb = json.load(open('databases/birthdays.json', encoding="utf-8"))
         
         if datetime.strptime(f"{day:02d}-{month:02d}-{year}", "%d-%m-%Y"):
-            birthdaysdb[f'{ctx.user.id}'] = f"{day:02d}-{month:02d}-{year}"
+            
+            send_sql(f"UPDATE discord_users SET birthday='{year}-{month:02d}-{day:02d}' WHERE userid='{ctx.user.id}'")
+            print(f"{ctx.user.name} birthday added: {year}-{month:02d}-{day:02d}")
+            
+            
+            
             await ctx.respond(f"Set {day:02d}-{month:02d}-{year} as your birthday.", ephemeral=True)
         else:
             ctx.respond("Wrong format, dd-mm-yyyy")
             return
             
-        with open('databases/birthdays.json', 'w') as outfile:
-                json.dump(birthdaysdb, outfile, indent=4)
-                
+
+     
+     
+     
                 
 
     @commands.slash_command(name="nextbirthdays", description="View upcoming birthdays.")
@@ -62,6 +69,10 @@ class birthday(commands.Cog):
             )
           
         await ctx.respond(embed=birthdays_embed, ephemeral=True)
+    
+    
+    
+    
         
     @tasks.loop(minutes=1)
     async def checkbirthday(self):
@@ -85,8 +96,29 @@ class birthday(commands.Cog):
                     
                     
             
+def parse_sql(data):
+    data = str(data).replace('&', "&#38") #Check &
+    data = str(data).replace("'", "&#39") #Check '
+    data = str(data).replace('"', "&#34") #Check "
+    data = str(data).replace('<', "&#60") #Check <
+    data = str(data).replace('>', "&#62") #Check >
+    return data
 
+def send_sql(sql):
+    GM_db = mysql.connector.connect(
+    host= os.getenv('SQL_HOST'),
+    user= os.getenv('SQL_USER'),
+    password= os.getenv('SQL_PASS'),
+    database= os.getenv('SQL_DB')
+    )             
+    GM_db_cursor = GM_db.cursor() 
         
+    GM_db_cursor.execute(sql)
+    result = GM_db_cursor.fetchall()
+    GM_db.commit()
+    GM_db.close()
+    return result
+    
 
 
 def setup(bot):
