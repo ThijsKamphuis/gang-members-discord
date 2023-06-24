@@ -1,3 +1,4 @@
+from itertools import count
 import discord
 from discord.ext import commands
 from discord.ext import tasks
@@ -8,7 +9,9 @@ from datetime import datetime, date, timedelta
 from dateutil import relativedelta
 from collections import defaultdict
 from re import sub
-
+from dotenv import load_dotenv
+import os
+import mysql.connector
 
 #### IDS ####
 gm_guild_id = 882248303822123018
@@ -21,7 +24,7 @@ GMStaff_id = 1067195296993517568
 GMAdmin_id = 882248427298230292
 GM_id = 882248832354750524
 
-
+load_dotenv()
 
 class motm(commands.Cog):
     def __init__(self, bot):
@@ -40,20 +43,17 @@ class motm(commands.Cog):
         voting_days_left = (abs(datetime.today() - ((datetime.today() + (relativedelta.relativedelta(months=1))).replace(day=1, hour= 0, minute= 0, second=1, microsecond= 0)))).days
         return voting_days_left
 
+
     #### COUNT VOTES ####
-    def count_votes(self):
+    def count_votes(self, month, year):
         global vote_standings
-        motm_votes_db = json.load(open('databases/motm_votes.json', encoding="utf-8"))
-        vote_standings = defaultdict(int)
-        for i in motm_votes_db:
-            if i in motm_votes_db:
-                vote_standings[i["Vote"]] += 1
-            else:
-                vote_standings[i["Vote"]] = 1
-                
-        vote_standings = sorted(vote_standings.items(), key=lambda item: item[1], reverse=True)
-        return vote_standings
+        # GET ALL VOTES FROM DB IN SELECTED MONTH
+        motm_vote_count = send_sql(f"SELECT voted_userid, COUNT(*) AS 'votes' FROM motm_votes WHERE month='{str(month).zfill(2)}' AND year='{year}' GROUP BY voted_userid ORDER BY votes DESC")
+        # RETURN LIST OF TUPLES [(userid, count)]
+        return motm_vote_count
+    
         
+
 
     #### GENERATE EMBED ####
     def motm_embed_gen(self):
@@ -80,6 +80,8 @@ class motm(commands.Cog):
 
         motm_embed.set_footer(text="Use /motmvote @user to vote!")
 
+
+
     #### EDIT EMBED ####
     async def edit_embed(self):
         self.motm_embed_gen()
@@ -91,6 +93,10 @@ class motm(commands.Cog):
         msg = await ch.fetch_message(motm_db_ID)
         await msg.edit(embed= motm_embed)
         return
+        
+        
+        
+        
         
         
     #### INIT MOTM ####
@@ -117,6 +123,9 @@ class motm(commands.Cog):
         else:
             raise error
 
+
+
+
     #### DEL EMBED ####
     @commands.slash_command(name="motmdel", description="Purge MOTM channel (DEV ONLY)")
     @commands.has_any_role(GMDev_id)
@@ -137,39 +146,42 @@ class motm(commands.Cog):
     async def refresh_MOTM(self):
         await self.edit_embed()
     
+    
+    
+    
+    
     #### VOTE MOTM ####
     @commands.slash_command(name="motmvote", description="Vote for MOTM (GM ONLY)")
     @commands.has_any_role(GM_id)
-    async def motmvote(self, ctx: discord.ApplicationContext, user: str):
-        voter = sub("[<,>,@]", "", str(ctx.author.id))
-        user = sub("[<,>,@]", "", str(user))
+    async def motmvote(self, ctx: discord.ApplicationContext, vote: str):
+        user = ctx.author
+        voted_user = self.bot.get_guild(gm_guild_id).get_member(int(sub("[<,>,@]", "", str(vote))))
         
         GM_role = discord.utils.get(ctx.guild.roles, id=GM_id)
         GMadmin_role = discord.utils.get(ctx.guild.roles, id=GMAdmin_id)
-        user_model = self.bot.get_guild(gm_guild_id).get_member(int(user))
+        voted_user_model = self.bot.get_guild(gm_guild_id).get_member(int(voted_user.id))
         
-        if (GM_role in user_model.roles):
-            if (GMadmin_role in user_model.roles):
-                await ctx.respond("Chosen user is an Admin", ephemeral=True)
-            else:
-                if voter == user:
-                    await ctx.respond("You can't vote on yourself", ephemeral=True)
-                    await self.bot.get_channel(882251873686519828).send(f"L bozo <@{ctx.author.id}> tried to vote on themselves")
-                else:
-                    motm_votes_db = json.load(open('databases/motm_votes.json', encoding="utf-8"))
-                    if not any(d["User"] == voter for d in motm_votes_db):
-                        motm_votes_db.append({"Vote":user,"User":voter})
-                        with open('databases/motm_votes.json', 'w') as outfile:
-                            json.dump(motm_votes_db, outfile, indent=4)
-
-                        await ctx.respond(f"You voted for <@{user}>.", ephemeral=True)
-                    else:
-                        await ctx.respond("You already voted", ephemeral=True)
-        else:
+        # CHECK IF GM
+        if not (GM_role in voted_user_model.roles):
             await ctx.respond("Chosen user is not a GangMember", ephemeral=True)
+        # CHECK IF ADMIN
+        elif (GMadmin_role in voted_user_model.roles):
+            await ctx.respond("Chosen user is an Admin", ephemeral=True)
+        # CHECK IF SAME USER
+        elif (voted_user == user):
+            await ctx.respond("Chosen user is yourself", ephemeral=True)
+        #CHECK IF ALREADY VOTED
+        elif send_sql(f"SELECT * FROM motm_votes WHERE userid='{user.id}' AND month='{str((datetime.now().month)).zfill(2)}' AND year='{datetime.now().year}'"):
+            await ctx.respond("You already voted this month", ephemeral=True)
+        #SEND VOTE TO DB
+        else:  
+            next_vote_id = send_sql("SELECT MAX(id) FROM motm_votes")[0][0] + 1
+            send_sql(f"INSERT INTO motm_votes(`id`, `userid`, `username`, `voted_userid`, `voted_username`, `month`, `year`) VALUES ('{next_vote_id}', '{user.id}', '{user.name}', '{voted_user.id}', '{voted_user.name}', '{str((datetime.now().month)).zfill(2)}', '{datetime.now().year}')")
+            
+            await ctx.respond(f"You voted for <@{voted_user.id}>.", ephemeral=True)
+            print(f"{user.name} voted for {voted_user.name} with DB id: {next_vote_id}")
         
-        await self.refresh_MOTM()
-        
+                
     @motmvote.error
     async def motmvote_role_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
         if isinstance(error, commands.MissingAnyRole):
@@ -183,11 +195,16 @@ class motm(commands.Cog):
             await ctx.respond("Invalid input, mention a user", ephemeral=True)
 
 
+
+
+
+
+
     #### MOTM STANDINGS ####
     @commands.slash_command(name="motmstandings", description="View MOTM standings (ADMIN ONLY)")
     @commands.has_any_role(GMAdmin_id, GMDev_id)
     async def motmstandings(self, ctx: discord.ApplicationContext):
-        await ctx.respond("\n".join([f"{i}. <@{user[0]}>: **{user[1]}**" for i, user in enumerate(motm.count_votes(self), start=1)]), ephemeral = True)
+        await ctx.respond("\n".join([f"{i}. <@{user[0]}>: **{user[1]}**" for i, user in enumerate(motm.count_votes(self, datetime.now().month, datetime.now().year), start=1)]), ephemeral = True)
         
     @motmstandings.error
     async def motmstandings_role_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
@@ -195,7 +212,12 @@ class motm(commands.Cog):
             await ctx.respond("You do not have permission to use this command. (ADMIN ONLY)", ephemeral=True)
         else:
             raise error     
-        
+    
+    
+    
+    
+    
+       
     #### RESET VOTES ####
     def reset_voting():
 
@@ -262,6 +284,32 @@ class motm(commands.Cog):
             await self.motm_announce()
             motm.reset_voting()
             await self.refresh_MOTM()
-      
+            
+            
+            
+def parse_sql(data):
+    data = str(data).replace('&', "&#38") #Check &
+    data = str(data).replace("'", "&#39") #Check '
+    data = str(data).replace('"', "&#34") #Check "
+    data = str(data).replace('<', "&#60") #Check <
+    data = str(data).replace('>', "&#62") #Check >
+    return data
+    
+def send_sql(sql):
+    GM_db = mysql.connector.connect(
+    host= os.getenv('SQL_HOST'),
+    user= os.getenv('SQL_USER'),
+    password= os.getenv('SQL_PASS'),
+    database= os.getenv('SQL_DB')
+    )             
+    GM_db_cursor = GM_db.cursor() 
+          
+    GM_db_cursor.execute(sql)
+    result = GM_db_cursor.fetchall()
+    GM_db.commit()
+    GM_db.close()
+    return result
+
+
 def setup(bot):
     bot.add_cog(motm(bot))

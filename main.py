@@ -110,18 +110,14 @@ async def on_member_remove(member):
 #### AUTO UPDATE DATABASES #########################################################
 @bot.event
 async def on_member_update(before, after):
+    print("MEMBER UPDATE TRIGGERED")
     download_user_pfp(after)
     upload_user_pfp(after) 
     update_member(after)
   
 @bot.event
-async def on_user_update(before, after):
-    download_user_pfp(after)
-    upload_user_pfp(after)
-    update_member(after)
-  
-@bot.event
 async def on_guild_role_update(before, after):
+    print("ROLE UPDATE TRIGGERED")
     for member in bot.get_guild(gm_guild_id).get_role(after.id).members:
         update_member(member)
 
@@ -269,13 +265,10 @@ def send_sql(sql):
     GM_db_cursor = GM_db.cursor() 
           
     GM_db_cursor.execute(sql)
+    result = GM_db_cursor.fetchall()
     GM_db.commit()
     GM_db.close()
-
-
-
-
-
+    return result
 
 
 
