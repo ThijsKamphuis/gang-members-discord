@@ -81,7 +81,7 @@ class activity(commands.Cog):
         else:
             raise error   
 
-    @tasks.loop(hours=1.0)
+    @tasks.loop(minutes=1.0)
     async def refresh_Activity(self):
         await self.motmactivity(self)
 

@@ -287,6 +287,12 @@ class motm(commands.Cog):
             await self.motm_announce()
             await self.refresh_MOTM()
             
+            # ADD MOTM TO DATABASE
+            motmmember = self.bot.get_guild(gm_guild_id).get_member(int(motm_vote_count[0][0]))
+            next_motmid = send_sql("SELECT MAX(motmid) FROM motm")[0][0] + 1
+            
+            send_sql(f"INSERT INTO motm (motmid, userid, username, month, year) VALUES ('{next_motmid}', '{motmmember.id}', '{motmmember.name}', '{str(datetime.now().month).zfill(2)}', '{datetime.now().year}')")
+    
  
  
             
