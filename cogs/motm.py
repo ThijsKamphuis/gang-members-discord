@@ -5,7 +5,7 @@ import discord.utils
 import json
 import random
 from datetime import datetime, date, timedelta
-from dateutil import relativedelta
+from dateutil.relativedelta import relativedelta
 from re import sub
 from dotenv import load_dotenv
 import os
@@ -39,7 +39,7 @@ class motm(commands.Cog):
         return motm
 
     def votingdaysleft(self):
-        voting_days_left = (abs(datetime.today() - ((datetime.today() + (relativedelta.relativedelta(months=1))).replace(day=1, hour= 0, minute= 0, second=1, microsecond= 0)))).days
+        voting_days_left = (abs(datetime.today() - ((datetime.today() + (relativedelta(months=1))).replace(day=1, hour= 0, minute= 0, second=1, microsecond= 0)))).days
         return voting_days_left
 
 
@@ -262,7 +262,7 @@ class motm(commands.Cog):
         motmuser = motm.get_motm(self)
         motm_role = self.bot.get_guild(gm_guild_id).get_role(motm_role_id)
         
-        motm_vote_count = self.count_votes((datetime.now().month - relativedelta(months=1)), datetime.now().year)
+        motm_vote_count = motm.count_votes(self, (date.today() - relativedelta(months=1)).month, datetime.now().year)
         
         await motmuser.remove_roles(motm_role)
         await self.bot.get_guild(gm_guild_id).get_member(int(motm_vote_count[0][0])).add_roles(motm_role)
@@ -276,7 +276,7 @@ class motm(commands.Cog):
         # CHECK IF IN FIRST OF MONTH
         if (first_of_month <= datetime.now() <= (first_of_month + timedelta(minutes=1))):
             # COUNT VOTES
-            motm_vote_count = self.count_votes((datetime.now().month - relativedelta(months=1)), datetime.now().year)
+            motm_vote_count = motm.count_votes(self, (date.today() - relativedelta(months=1)).month, datetime.now().year)
             # IF TOP 2 TIED
             if motm_vote_count[0][1] == motm_vote_count[1][1]:
                 # COINFLIP

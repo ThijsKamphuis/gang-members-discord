@@ -9,6 +9,8 @@ import mysql.connector
 from datetime import datetime
 from discord.ext import tasks
 
+from cogs.motm import motm
+
 gm_guild_id = 882248303822123018
 
 GMDev_id = 1059968168493318198
@@ -38,7 +40,12 @@ class activity(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         
-        motm_votes = send_sql(f"SELECT month, COUNT(*) AS 'votes' FROM motm_votes WHERE month='{str(datetime.now().month).zfill(2)}' AND year='{datetime.now().year}' GROUP BY month")[0][1]
+        motm_votes = send_sql(f"SELECT month, COUNT(*) AS 'votes' FROM motm_votes WHERE month='{str(datetime.now().month).zfill(2)}' AND year='{datetime.now().year}' GROUP BY month")
+        if motm_votes:
+            motm_votes = motm_votes[0][1]
+        else:
+            motm_votes = 0
+            
         total_gm = send_sql("SELECT rank, COUNT(*) AS 'rank' FROM `discord_users` WHERE rank='Gang Member' GROUP BY rank")[0][1]
         
         await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"MotM: {motm_votes} / {total_gm} Voted"))
@@ -65,7 +72,11 @@ class activity(commands.Cog):
     @commands.slash_command(name="motmactivity", description="Set MotM as activity (STAFF ONLY)")
     @commands.has_any_role(GMStaff_id, GMAdmin_id)
     async def motmactivity(self, ctx: discord.ApplicationContext):
-        motm_votes = send_sql(f"SELECT month, COUNT(*) AS 'votes' FROM motm_votes WHERE month='{str(datetime.now().month).zfill(2)}' AND year='{datetime.now().year}' GROUP BY month")[0][1]
+        motm_votes = send_sql(f"SELECT month, COUNT(*) AS 'votes' FROM motm_votes WHERE month='{str(datetime.now().month).zfill(2)}' AND year='{datetime.now().year}' GROUP BY month")
+        if motm_votes:
+            motm_votes = motm_votes[0][1]
+        else:
+            motm_votes = 0
         total_gm = send_sql("SELECT rank, COUNT(*) AS 'rank' FROM `discord_users` WHERE rank='Gang Member' GROUP BY rank")[0][1]
         
         await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"MotM: {motm_votes} / {total_gm} Voted"))
