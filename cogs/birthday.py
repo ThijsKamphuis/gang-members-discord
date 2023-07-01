@@ -79,7 +79,7 @@ class birthday(commands.Cog):
         
         checktime = datetime(datetime.today().year, datetime.today().month, datetime.today().day, hour=0, minute=1)
         
-        if (checktime <= datetime.now() <= (checktime + timedelta(minutes=10))):
+        if (checktime <= datetime.now() <= (checktime + timedelta(minutes=1))):
             birthdaysdb = send_sql("SELECT userid, birthday FROM `discord_users` WHERE birthday > 00000000")
             for birthday in birthdaysdb:
                 if (datetime.strptime(str(birthday[1]), "%Y-%m-%d").day == datetime.today().day) and (datetime.strptime(str(birthday[1]), "%Y-%m-%d").month == datetime.today().month):
