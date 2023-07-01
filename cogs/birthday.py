@@ -87,7 +87,7 @@ class birthday(commands.Cog):
                     
                     birthday_embed = discord.Embed(
                         title=f"It's {birthday_member.name}'s birthday!",
-                        description= f"{birthday_member.name} turned {datetime.now().year - datetime.strptime(birthday[1], '%Y-%m-%d').year} today!",
+                        description= f"{birthday_member.name} turned {datetime.now().year - datetime.strptime(str(birthday[1]), '%Y-%m-%d').year} today!",
                         color=0xae8cff
                     )
                     birthday_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
