@@ -77,7 +77,7 @@ class birthday(commands.Cog):
     @tasks.loop(minutes=1)
     async def checkbirthday(self):
         
-        checktime = datetime(datetime.today().year, datetime.today().month, datetime.today().day, hour=2, minute=16)
+        checktime = datetime(datetime.today().year, datetime.today().month, datetime.today().day, hour=0, minute=1)
         
         if (checktime <= datetime.now() <= (checktime + timedelta(minutes=10))):
             birthdaysdb = send_sql("SELECT userid, birthday FROM `discord_users` WHERE birthday > 00000000")
@@ -92,7 +92,7 @@ class birthday(commands.Cog):
                     )
                     birthday_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
                     
-                    await self.bot.get_channel(882252560608657408).send("@everyone", embed= birthday_embed)
+                    await self.bot.get_channel(882252560608657408).send(embed= birthday_embed)
                     
                     
             
