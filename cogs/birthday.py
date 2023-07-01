@@ -82,12 +82,12 @@ class birthday(commands.Cog):
         if (checktime <= datetime.now() <= (checktime + timedelta(minutes=10))):
             birthdaysdb = send_sql("SELECT userid, birthday FROM `discord_users` WHERE birthday > 00000000")
             for birthday in birthdaysdb:
-                if datetime.strptime((datetime.strftime(birthday[1], "%Y-%m-%d").day == datetime.today().day), "%d-%m-%Y") and datetime.strptime((datetime.strftime(birthday[1], "%Y-%m-%d").month == datetime.today().month), "%d-%m-%Y"):
+                if (datetime.strftime(str(birthday[1]), "%Y-%m-%d").day == datetime.today().day) and (datetime.strftime(str(birthday[1]), "%Y-%m-%d").month == datetime.today().month):
                     birthday_member = self.bot.get_guild(gm_guild_id).get_member(int(birthday[0]))
                     
                     birthday_embed = discord.Embed(
                         title=f"It's {birthday_member.name}'s birthday!",
-                        description= f"{birthday_member.name} turned {datetime.now().year - datetime.strptime(birthdaysdb[birthday][-4:], '%Y').year} today!",
+                        description= f"{birthday_member.name} turned {datetime.now().year - datetime.strptime(birthday[1], '%Y-%m-%d').year} today!",
                         color=0xae8cff
                     )
                     birthday_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
