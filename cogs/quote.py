@@ -1,9 +1,12 @@
+from ast import parse
 import discord
 from discord.ext import commands
 import discord.utils
 import json
 import random
 import math
+import mysql.connector
+import os
 
 def get_quote_page(page):
         quote_list = json.load(open('databases/quotes.json', encoding="utf-8"))
@@ -70,20 +73,18 @@ class quote(commands.Cog):
     #### QUOTE RANDOM ####
     @commands.slash_command(name="quote", description='Random Gang Member Quote')
     async def gmquote(self, ctx: discord.ApplicationContext):
-        gm_quote = random.sample(json.load(open('databases/quotes.json', encoding="utf-8")), 1)[0]
-        await ctx.respond(f'> {gm_quote["Quote"]}\n**~{gm_quote["Author"]}, {gm_quote["Year"]}**')
+        gm_quote = random.sample(send_sql("SELECT * FROM quotes"), 1)[0]
+        await ctx.respond(f'> {gm_quote[2]}\n**~{gm_quote[1]}, {gm_quote[3]}**')
 
 
     #### QUOTE ADD ####
     @commands.slash_command(name="quoteadd", description='Add a Gang Member Quote(GM Only)')
     @commands.has_any_role(882248832354750524)
-    async def gmquoteadd(self, ctx: discord.ApplicationContext, quote: str, author: str, year: int):     
-        quotelist = json.load(open('databases/quotes.json', encoding="utf-8"))
-        quotelist.append({"Quote":quote,"Author":author,"Year":year})
-        with open('databases/quotes.json', 'w') as outfile:
-            json.dump(quotelist, outfile, indent=4)
-
-        await ctx.respond(f'> {quote}\n**~{author}, {year}**\n Quote successfully added!')
+    async def gmquoteadd(self, ctx: discord.ApplicationContext, quote: str, author: str, year: int):
+        next_quote_id = send_sql("SELECT MAX(id) FROM quotes")[0][0] + 1
+        
+        send_sql(f"INSERT INTO `quotes` (`id`, `author`, `quote`, `year`) VALUES ('{next_quote_id}', '{parse_sql(author)}', '{parse_sql(quote)}', '{parse_sql(year)}')")
+        await ctx.respond(f'> {quote}\n**{author}, {year}**\n Quote successfully added!', ephemeral=True)
 
     #### QUOTE LIST ####
     @commands.slash_command(name="quotelist", description='List all Gang Member Quotes')
@@ -91,6 +92,35 @@ class quote(commands.Cog):
         get_quote_page(1)
         await ctx.respond(embed = quote_embed, view = QuoteButtonsView(), ephemeral=True)
 
+
         
+        
+        
+        
+def parse_sql(data):
+    data = str(data).replace('&', "&#38") #Check &
+    data = str(data).replace("'", "&#39") #Check '
+    data = str(data).replace('"', "&#34") #Check "
+    data = str(data).replace('<', "&#60") #Check <
+    data = str(data).replace('>', "&#62") #Check >
+    return data
+    
+def send_sql(sql):
+    GM_db = mysql.connector.connect(
+    host= os.getenv('SQL_HOST'),
+    user= os.getenv('SQL_USER'),
+    password= os.getenv('SQL_PASS'),
+    database= os.getenv('SQL_DB')
+    )             
+    GM_db_cursor = GM_db.cursor() 
+          
+    GM_db_cursor.execute(sql)
+    result = GM_db_cursor.fetchall()
+    GM_db.commit()
+    GM_db.close()
+    return result
+
+
+      
 def setup(bot):
     bot.add_cog(quote(bot))
