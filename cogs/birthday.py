@@ -82,7 +82,7 @@ class birthday(commands.Cog):
         if (checktime <= datetime.now() <= (checktime + timedelta(minutes=10))):
             birthdaysdb = send_sql("SELECT userid, birthday FROM `discord_users` WHERE birthday > 00000000")
             for birthday in birthdaysdb:
-                if (datetime.strptime(birthday[1], "%d-%m-%Y").day == datetime.today().day) and (datetime.strptime(birthday[1], "%d-%m-%Y").month == datetime.today().month):
+                if datetime.strptime((datetime.strftime(birthday[1], "%Y-%m-%d").day == datetime.today().day), "%d-%m-%Y") and datetime.strptime((datetime.strftime(birthday[1], "%Y-%m-%d").month == datetime.today().month), "%d-%m-%Y"):
                     birthday_member = self.bot.get_guild(gm_guild_id).get_member(int(birthday[0]))
                     
                     birthday_embed = discord.Embed(
