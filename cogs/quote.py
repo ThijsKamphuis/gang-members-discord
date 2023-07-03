@@ -8,8 +8,21 @@ import math
 import mysql.connector
 import os
 
+gm_guild_id = 882248303822123018
+
+motm_channel_id = 1065028419487793182
+motm_role_id = 1062507887718567986
+
+GMDev_id = 1059968168493318198
+GMStaff_id = 1067195296993517568
+GMAdmin_id = 882248427298230292
+GM_id = 882248832354750524
+Regular_id = 1065394897835794453
+NPC_id = 882251536653230151
+Bot_id = 882253119063470133
+
 def get_quote_page(page):
-        quote_list = json.load(open('databases/quotes.json', encoding="utf-8"))
+        quote_list = send_sql("SELECT * FROM quotes ORDER BY id ASC")
 
         totalpages = (math.ceil(len(quote_list) / 6))
         quoteindex = 0 + ((page - 1) * 6)
@@ -28,8 +41,8 @@ def get_quote_page(page):
 
             for x in range(quoteindex, (quoteindex + 6)):
                 quote_embed.add_field(
-                    name=quote_list[quoteindex]["Quote"],
-                    value=f'{quote_list[quoteindex]["Author"]}, {quote_list[quoteindex]["Year"]}\n \u200B',
+                    name=quote_list[quoteindex][2],
+                    value=f'{quote_list[quoteindex][1]}, {quote_list[quoteindex][3]}  `id:{quote_list[quoteindex][0]}`\n \u200B',
                     inline=False
                 )
                 quoteindex += 1
@@ -42,8 +55,8 @@ def get_quote_page(page):
 
             for z in range(quoteindex, len(quote_list)):
                 quote_embed.add_field(
-                    name=quote_list[quoteindex]["Quote"],
-                    value=f'{quote_list[quoteindex]["Author"]}, {quote_list[quoteindex]["Year"]}\n \u200B',
+                    name=quote_list[quoteindex][2],
+                    value=f'{quote_list[quoteindex][1]}, {quote_list[quoteindex][3]}  `id:{quote_list[quoteindex][0]}`\n \u200B',
                     inline=False
                 )
                 quoteindex += 1
@@ -78,8 +91,8 @@ class quote(commands.Cog):
 
 
     #### QUOTE ADD ####
-    @commands.slash_command(name="quoteadd", description='Add a Gang Member Quote(GM Only)')
-    @commands.has_any_role(882248832354750524)
+    @commands.slash_command(name="quoteadd", description='Add a Gang Member Quote (GM Only)')
+    @commands.has_any_role(GM_id)
     async def gmquoteadd(self, ctx: discord.ApplicationContext, quote: str, author: str, year: int):
         next_quote_id = send_sql("SELECT MAX(id) FROM quotes")[0][0] + 1
         
@@ -92,8 +105,17 @@ class quote(commands.Cog):
         get_quote_page(1)
         await ctx.respond(embed = quote_embed, view = QuoteButtonsView(), ephemeral=True)
 
-
+    #### QUOTE DEL ####
+    @commands.slash_command(name="quotedel", description='Delete a Gang Member Quote (STAFF Only)')
+    @commands.has_any_role(GMStaff_id, GMDev_id, GMAdmin_id)
+    async def gmquotedel(self, ctx: discord.ApplicationContext, id: int):
+        id_quote = send_sql(f"SELECT * FROM quotes WHERE id='{id}'")[0]
         
+        send_sql(f"DELETE FROM quotes WHERE id='{id}'")
+        
+        await ctx.respond(f'> {id_quote[2]}\n**{id_quote[1]}, {id_quote[3]}**\n Quote successfully deleted!', ephemeral=True)
+        
+    
         
         
         

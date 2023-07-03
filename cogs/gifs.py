@@ -20,7 +20,7 @@ class gifs(commands.Cog):
         await ctx.respond("https://tenor.com/view/manoe-gangmembers-gm-gif-27494707")
         return
     
-    #### MANOE GIF ####
+    #### BRAM GIF ####
     @commands.slash_command(name="bram", description='BRAM')
     async def bramgif(self, ctx: discord.ApplicationContext):
         await ctx.respond("https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExODhhZmI4MDRhN2JlNzFmOGUzYmFkYWFiZWFiYzY2NjMxODU1Nzg1YyZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/4tFyr7OuPTtPC1VFve/giphy.gif")
