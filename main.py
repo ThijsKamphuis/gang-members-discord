@@ -8,7 +8,7 @@ import mysql.connector
 import paramiko
 from datetime import datetime
 from re import sub
-
+import re
 
 #### SETUP ##################################################################
 load_dotenv()
@@ -316,8 +316,46 @@ async def userinfo(ctx: discord.ApplicationContext, user: str):
 
 
 
+#### AUTO DELETE LINK EDITS ###############################################
 
-
+@bot.event
+async def on_message_edit(before, after):
+    regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+    if not re.findall(regex, after.content):
+        return
+    
+    await after.delete()
+    
+    embed = discord.Embed(
+        title="Message deleted",
+        color=discord.Color.from_rgb(174, 140, 255),
+        description="Message edit contained url"
+    )
+    
+    embed.set_thumbnail(url="https://gangmembers.eu/img/favicon/android-chrome-512x512.png")
+    
+    embed.add_field(
+        name="User",
+        value=f"<@{after.author.id}>",
+        inline=True
+    )
+    embed.add_field(
+        name="Channel",
+        value=after.channel.name,
+        inline=True
+    )
+    embed.add_field(
+        name="Message",
+        value=after.content,
+        inline=False
+    )
+    
+    
+    ch = await bot.fetch_channel(1132783367444758578)
+    await ch.send(embed=embed)
+        
+    
+    
 
 #### FUNCTIONS #############################################################
 def parse_sql(data):
