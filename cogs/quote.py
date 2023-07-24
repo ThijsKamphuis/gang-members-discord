@@ -41,8 +41,8 @@ def get_quote_page(page):
 
             for x in range(quoteindex, (quoteindex + 6)):
                 quote_embed.add_field(
-                    name=quote_list[quoteindex][2],
-                    value=f'{quote_list[quoteindex][1]}, {quote_list[quoteindex][3]}  `id:{quote_list[quoteindex][0]}`\n \u200B',
+                    name=reverse_sql(quote_list[quoteindex][2]),
+                    value=f'{reverse_sql(quote_list[quoteindex][1])}, {reverse_sql(quote_list[quoteindex][3])}  `id:{reverse_sql(quote_list[quoteindex][0])}`\n \u200B',
                     inline=False
                 )
                 quoteindex += 1
@@ -55,8 +55,8 @@ def get_quote_page(page):
 
             for z in range(quoteindex, len(quote_list)):
                 quote_embed.add_field(
-                    name=quote_list[quoteindex][2],
-                    value=f'{quote_list[quoteindex][1]}, {quote_list[quoteindex][3]}  `id:{quote_list[quoteindex][0]}`\n \u200B',
+                    name=reverse_sql(quote_list[quoteindex][2]),
+                    value=f'{reverse_sql(quote_list[quoteindex][1])}, {reverse_sql(quote_list[quoteindex][3])}  `id:{reverse_sql(quote_list[quoteindex][0])}`\n \u200B',
                     inline=False
                 )
                 quoteindex += 1
@@ -87,8 +87,13 @@ class quote(commands.Cog):
     @commands.slash_command(name="quote", description='Random Gang Member Quote')
     async def gmquote(self, ctx: discord.ApplicationContext):
         gm_quote = random.sample(send_sql("SELECT * FROM quotes"), 1)[0]
-        await ctx.respond(f'> {gm_quote[2]}\n**~{gm_quote[1]}, {gm_quote[3]}**')
+        await ctx.respond(f'> {reverse_sql(gm_quote[2])}\n**~{reverse_sql(gm_quote[1])}, {reverse_sql(gm_quote[3])}**')
 
+    #### QUOTE BY ID ####
+    @commands.slash_command(name="quoteid", description='Get quote by id')
+    async def gmquoteid(self, ctx: discord.ApplicationContext, quote_id: int):
+        gm_quote = send_sql(f"SELECT * FROM quotes WHERE id = '{quote_id}'")[0]
+        await ctx.respond(f'> {reverse_sql(gm_quote[2])}\n**~{reverse_sql(gm_quote[1])}, {reverse_sql(gm_quote[3])}**')
 
     #### QUOTE ADD ####
     @commands.slash_command(name="quoteadd", description='Add a Gang Member Quote (GM Only)')
@@ -126,6 +131,15 @@ def parse_sql(data):
     data = str(data).replace('<', "&#60") #Check <
     data = str(data).replace('>', "&#62") #Check >
     return data
+
+def reverse_sql(data):
+    data = str(data).replace('&#38', "&") #Check &
+    data = str(data).replace("&#39", "'") #Check '
+    data = str(data).replace('&#34', '"') #Check "
+    data = str(data).replace('&#60', "<") #Check <
+    data = str(data).replace('&#62', ">") #Check >
+    return data
+
     
 def send_sql(sql):
     GM_db = mysql.connector.connect(
