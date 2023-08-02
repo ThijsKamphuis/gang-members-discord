@@ -149,7 +149,7 @@ class motm(commands.Cog):
     @commands.has_any_role(GM_id)
     async def motmvote(self, ctx: discord.ApplicationContext, vote: str):
         user = ctx.author
-        voted_user = self.bot.get_guild(gm_guild_id).get_member(int(sub("[<,>,@]", "", str(vote))))
+        voted_user = self.bot.get_guild(gm_guild_id).get_member(int(sub("[!,<,>,@]", "", str(vote))))
         
         GM_role = discord.utils.get(ctx.guild.roles, id=GM_id)
         GMadmin_role = discord.utils.get(ctx.guild.roles, id=GMAdmin_id)
