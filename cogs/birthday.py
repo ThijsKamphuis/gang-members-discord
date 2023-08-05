@@ -41,8 +41,12 @@ class birthday(commands.Cog):
 
     @commands.slash_command(name="nextbirthdays", description="View upcoming birthdays.")
     async def nextbirthdays(self, ctx: discord.ApplicationContext):
-        og_birthdaysdb = json.load(open('databases/birthdays.json', encoding="utf-8"))
-
+        sql_birthdaysdb = send_sql("SELECT userid, birthday FROM `discord_users` WHERE birthday != 0")
+        
+        og_birthdaysdb = {}
+        for k, v in sql_birthdaysdb:
+            og_birthdaysdb.setdefault(k, v.strftime("%d-%m-%Y"))
+        
         birthdays = {k: v[:-4] + str(datetime.now().year) for k, v in og_birthdaysdb.items()}
         birthdays = {k: (datetime.strptime(v, "%d-%m-%Y") - datetime.now()).days + 1 for k, v in birthdays.items()}
 
