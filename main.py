@@ -6,7 +6,7 @@ from num2words import num2words
 import requests
 import mysql.connector
 import paramiko
-from datetime import datetime
+from datetime import datetime, timedelta
 from re import sub
 import re
 
@@ -324,7 +324,11 @@ async def on_message_edit(before, after):
     if not re.findall(regex, after.content):
         return
     
+    if not after.edited_at:
+        return
+    
     await after.delete()
+ 
     
     embed = discord.Embed(
         title="Message deleted",
