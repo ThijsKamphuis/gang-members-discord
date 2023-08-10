@@ -321,6 +321,10 @@ async def userinfo(ctx: discord.ApplicationContext, user: str):
 @bot.event
 async def on_message_edit(before, after):
     regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+    if after.author.top_role.id == GMStaff_id in (GMStaff_id, GMAdmin_id):
+        return
+    
+    
     if not re.findall(regex, after.content):
         return
     
