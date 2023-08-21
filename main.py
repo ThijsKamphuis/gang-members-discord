@@ -9,6 +9,7 @@ import paramiko
 from datetime import datetime, timedelta
 from re import sub
 import re
+import imghdr
 
 #### SETUP ##################################################################
 load_dotenv()
@@ -362,7 +363,29 @@ async def on_message_edit(before, after):
     ch = await bot.fetch_channel(1132783367444758578)
     await ch.send(embed=embed)
         
+#### POLISHMOMENTS ####################################################################################
+@bot.slash_command(name="addpolishmoment", description='Add Polishmoment')
+async def addpolishmoment(ctx: discord.ApplicationContext, polishgif: discord.Attachment):
+    if not polishgif.content_type == 'image/gif':
+        await ctx.respond("ONLY UPLOAD GIF KURWA", ephemeral= True)
+        return
     
+    await polishgif.save(f"polishmoments/{polishgif.filename}")
+    await ctx.respond("GIF UPLOADED", ephemeral= True)
+ 
+    GM_sftp, transport = open_sftp()
+    GM_sftp.put(f"polishmoments/{polishgif.filename}", f"img/discord_upload/polishmoments/{polishgif.filename}")
+    transport.close()
+    
+    send_sql(f"INSERT INTO polish_moments(link) VALUES ('gangmembers.eu/img/discord_upload/polishmoments/{polishgif.filename}')")
+
+
+@bot.slash_command(name="polishmoment", description='Random Polishmoment')
+async def polishmoment(ctx: discord.ApplicationContext):
+    return
+      
+    
+
     
 
 #### FUNCTIONS #############################################################
