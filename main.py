@@ -384,7 +384,7 @@ async def addpolishmoment(ctx: discord.ApplicationContext, polishgif: discord.At
 
 @bot.slash_command(name="polishmoment", description='Random Polishmoment')
 async def polishmoment(ctx: discord.ApplicationContext):
-    randomgif = random.sample(send_sql("SELECT * FROM polish_moments"), 1)[0]
+    randomgif = random.sample(send_sql("SELECT * FROM polish_moments"), 1)[0][0]
     await ctx.respond(randomgif)
     return
       
