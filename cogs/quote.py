@@ -102,7 +102,7 @@ class quote(commands.Cog):
         next_quote_id = send_sql("SELECT MAX(id) FROM quotes")[0][0] + 1
         
         send_sql(f"INSERT INTO `quotes` (`id`, `author`, `quote`, `year`) VALUES ('{next_quote_id}', '{parse_sql(author)}', '{parse_sql(quote)}', '{parse_sql(year)}')")
-        await ctx.respond(f'> {quote}\n**{author}, {year}**\n Quote successfully added!', ephemeral=True)
+        await ctx.respond(f'> {quote}\n**{author}, {year}** `ID: {next_quote_id}`\n Quote successfully added!', ephemeral=True)
 
     #### QUOTE LIST ####
     @commands.slash_command(name="quotelist", description='List all Gang Member Quotes')
