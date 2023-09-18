@@ -9,7 +9,9 @@ import paramiko
 from datetime import datetime, timedelta
 from re import sub
 import re
-import imghdr
+import random
+
+from cogs.motm import send_sql
 
 #### SETUP ##################################################################
 load_dotenv()
@@ -377,11 +379,13 @@ async def addpolishmoment(ctx: discord.ApplicationContext, polishgif: discord.At
     GM_sftp.put(f"polishmoments/{polishgif.filename}", f"img/discord_upload/polishmoments/{polishgif.filename}")
     transport.close()
     
-    send_sql(f"INSERT INTO polish_moments(link) VALUES ('gangmembers.eu/img/discord_upload/polishmoments/{polishgif.filename}')")
+    send_sql(f"INSERT INTO polish_moments(link) VALUES ('https://gangmembers.eu/img/discord_upload/polishmoments/{polishgif.filename}')")
 
 
 @bot.slash_command(name="polishmoment", description='Random Polishmoment')
 async def polishmoment(ctx: discord.ApplicationContext):
+    randomgif = random.sample(send_sql("SELECT * FROM polish_moments"), 1)[0][0]
+    await ctx.respond(randomgif)
     return
       
     
