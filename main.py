@@ -72,6 +72,10 @@ async def on_connect():
 async def on_ready():
     print(f'We have logged in as {bot.user}')
     print()
+    get_all_members()
+    update_all_members()
+    download_all_pfps()
+    upload_all_pfps()
 
     # GET ACTIVE INVITES
     global invites
