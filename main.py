@@ -316,9 +316,6 @@ async def userinfo(ctx: discord.ApplicationContext, user: str):
             )
     await ctx.respond(embed=embed, ephemeral=True)
 
-
-
-
 #### AUTO DELETE LINK EDITS ###############################################
 
 @bot.event
