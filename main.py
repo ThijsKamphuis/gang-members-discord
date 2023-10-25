@@ -73,6 +73,7 @@ async def on_ready():
     print(f'We have logged in as {bot.user}')
     print()
 
+
     # GET ACTIVE INVITES
     global invites
     invites = await bot.get_guild(gm_guild_id).invites()
