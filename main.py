@@ -364,6 +364,44 @@ async def on_message_edit(before, after):
     
     ch = await bot.fetch_channel(1132783367444758578)
     await ch.send(embed=embed)
+    
+#### SEND MESSAGE IS BAN ##############################################################################
+
+@bot.event
+async def on_message(message):
+    if message.channel.id == 1166743302293434378:
+        staff_role = bot.get_guild(gm_guild_id).get_role(GMStaff_id)
+        admin_role = bot.get_guild(gm_guild_id).get_role(GMAdmin_id)
+        if staff_role in message.author.roles or admin_role in message.author.roles:
+            return
+        await message.author.ban(delete_message_days = 1, reason = "Bot spam verification failed")
+        embed = discord.Embed(
+            title="BOT SPAM BIMBIMBAMAM",
+            color=discord.Color.from_rgb(174, 140, 255),
+            description="Bot spam verification"
+        )
+        
+        embed.set_thumbnail(url="https://gangmembers.eu/img/favicon/android-chrome-512x512.png")
+        
+        embed.add_field(
+            name="User",
+            value=f"<@{message.author.id}>",
+            inline=True
+        )
+        embed.add_field(
+            name="Channel",
+            value=message.channel.name,
+            inline=True
+        )
+        embed.add_field(
+            name="Message",
+            value=message.content,
+            inline=False
+        )
+    
+    
+        ch = await bot.fetch_channel(1132783367444758578)
+        await ch.send(embed=embed)  
         
 #### POLISHMOMENTS ####################################################################################
 @bot.slash_command(name="addpolishmoment", description='Add Polishmoment')
