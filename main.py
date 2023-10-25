@@ -362,7 +362,9 @@ async def on_message_edit(before, after):
     
     ch = await bot.fetch_channel(1132783367444758578)
     await ch.send(embed=embed)
-    
+
+
+
 #### SEND MESSAGE IS BAN ##############################################################################
 
 @bot.event
