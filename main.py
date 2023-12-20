@@ -73,15 +73,6 @@ async def on_ready():
     print(f'We have logged in as {bot.user}')
     print()
 
-
-    # GET ACTIVE INVITES
-    global invites
-    invites = await bot.get_guild(gm_guild_id).invites()
- 
-
-
-
-
 #### ON MEMBER JOIN #########################################################
 @bot.event
 async def on_member_join(member):
@@ -97,21 +88,6 @@ async def on_member_join(member):
     upload_member(member)
     print()
     
-    #GET INVITE USED
-    global invites
-    old_invites = invites
-    new_invites = await bot.get_guild(gm_guild_id).invites()
-    
-    for invite in new_invites:
-        if invite.uses != old_invites[new_invites.index(invite)].uses:
-            print(f"{member.name} joined using invite code: {invite.code}")
-            print(f"Invite made by: {invite.inviter.name}")
-            
-            #### SEND TO DB
-            send_sql(f"UPDATE discord_users SET invitecode='{invite.code}', inviter='{invite.inviter.name}' WHERE userid='{member.id}'")
-            print("\n")
-            
-    invites = await bot.get_guild(gm_guild_id).invites()
     
 #### ON MEMBER LEAVE ############################################################
 @bot.event
@@ -230,16 +206,18 @@ def get_all_members():
         memberlist.append(memberinfo)
     print("Fetched all members")
     
-def upload_all_members():
+def insert_all_members():
     for member in memberlist:
-        send_sql(f"INSERT INTO discord_users(userid, username, rank, roles, avatarurl) VALUES ({parse_sql(member['userid'])}, '{parse_sql(member['username'])}', '{parse_sql(member['rank'])}', '{parse_sql(member['roles'])}', '{parse_sql(member['avatarurl'])}')")
-    print("Uploaded all members")
+        send_sql(f"INSERT IGNORE INTO discord_users(userid, username, rank, roles, avatarurl) VALUES ({parse_sql(member['userid'])}, '{parse_sql(member['username'])}', '{parse_sql(member['rank'])}', '{parse_sql(member['roles'])}', '{parse_sql(member['avatarurl'])}')")
+        print(f"Inserted {member['username']}")
+    print("Inserted all members")
     
 def update_all_members():
     for member in memberlist:
         send_sql(f"UPDATE discord_users SET username = '{parse_sql(member['username'])}', rank = '{parse_sql(member['rank'])}', roles = '{parse_sql(member['roles'])}', avatarurl = '{parse_sql(member['avatarurl'])}' WHERE userid = {parse_sql(member['userid'])}")
+        print(f"Updated {member['username']}")
     print("Updated all members")
-    
+     
 def upload_member(member):
     rank, roles = format_roles(member)
     send_sql(f"INSERT INTO discord_users(userid, username, rank, roles, avatarurl) VALUES ({parse_sql(member.id)}, '{parse_sql(member.name)}', '{parse_sql(rank)}', '{parse_sql(roles)}', '{parse_sql(f'https://gangmembers.eu/img/discord_upload/profilepics/{member.name}.png')}')")
@@ -289,8 +267,6 @@ info_columns = [
     "rank",
     "roles",
     "birthday",
-    "invitecode",
-    "inviter",
     "avatarurl"
 ]
 
