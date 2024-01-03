@@ -6,7 +6,7 @@ from num2words import num2words
 import requests
 import mysql.connector
 import paramiko
-from datetime import datetime, timedelta
+from datetime import datetime
 from re import sub
 import re
 import random
@@ -35,6 +35,7 @@ GMDev_id = 1059968168493318198
 GMStaff_id = 1067195296993517568
 GMAdmin_id = 882248427298230292
 GM_id = 882248832354750524
+GMLight_id = 1191905861770154048
 Regular_id = 1065394897835794453
 NPC_id = 882251536653230151
 Bot_id = 882253119063470133
@@ -56,6 +57,8 @@ special_roles = [
     1065022590298620015, #C reload
     1116098626603716609, #Vis van de dag
     1100852249187594260, #Background NPC
+    1096558106495954975, #GM Team
+    
 ]
 
 #### STARTUP ###############################################################
@@ -72,6 +75,10 @@ async def on_connect():
 async def on_ready():
     print(f'We have logged in as {bot.user}')
     print()
+    
+    member = bot.get_guild(gm_guild_id).get_member(327856498174853121)
+     
+    print(member.roles)
 
 #### ON MEMBER JOIN #########################################################
 @bot.event
@@ -236,7 +243,7 @@ def delete_member(member):
 
 
 def format_roles(member):
-    if member.top_role.id == GM_id or member.top_role.id == Regular_id or member.top_role.id == NPC_id or member.top_role.id == Bot_id:
+    if member.top_role.id == GM_id or member.top_role.id == GMLight_id or member.top_role.id == Regular_id or member.top_role.id == NPC_id or member.top_role.id == Bot_id:
         rank = member.top_role.name
         roles = ''
     else:

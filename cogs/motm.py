@@ -21,6 +21,8 @@ GMDev_id = 1059968168493318198
 GMStaff_id = 1067195296993517568
 GMAdmin_id = 882248427298230292
 GM_id = 882248832354750524
+GMLight_id = 1191905861770154048
+
 
 load_dotenv()
 
@@ -146,21 +148,19 @@ class motm(commands.Cog):
     
     #### VOTE MOTM ####
     @commands.slash_command(name="motmvote", description="Vote for MOTM (GM ONLY)")
-    @commands.has_any_role(GM_id)
+    @commands.has_any_role(GM_id, GMLight_id)
     async def motmvote(self, ctx: discord.ApplicationContext, vote: str):
         user = ctx.author
         voted_user = self.bot.get_guild(gm_guild_id).get_member(int(sub("[!,<,>,@]", "", str(vote))))
         
         GM_role = discord.utils.get(ctx.guild.roles, id=GM_id)
         GMadmin_role = discord.utils.get(ctx.guild.roles, id=GMAdmin_id)
+        GMlight_role = discord.utils.get(ctx.guild.roles, id=GMLight_id)
         voted_user_model = self.bot.get_guild(gm_guild_id).get_member(int(voted_user.id))
         
         # CHECK IF GM
         if not (GM_role in voted_user_model.roles):
             await ctx.respond("Chosen user is not a GangMember", ephemeral=True)
-        # CHECK IF ADMIN
-        elif (GMadmin_role in voted_user_model.roles):
-            await ctx.respond("Chosen user is an Admin", ephemeral=True)
         # CHECK IF SAME USER
         elif (voted_user == user):
             await ctx.respond("Chosen user is yourself", ephemeral=True)
