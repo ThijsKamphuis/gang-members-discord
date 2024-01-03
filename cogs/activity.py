@@ -46,7 +46,8 @@ class activity(commands.Cog):
         else:
             motm_votes = 0
             
-        total_gm = send_sql("SELECT COUNT(*) FROM `discord_users` WHERE rank='Gang Member' OR rank='GM Light'")
+        total_gm = send_sql("SELECT COUNT(*) FROM `discord_users` WHERE rank='Gang Member' OR rank='GM Light'")[0][0]
+        
         
         await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"MotM: {motm_votes} / {total_gm} Voted"))
         
