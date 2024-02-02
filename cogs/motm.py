@@ -176,7 +176,7 @@ class motm(commands.Cog):
             print(f"{user.name} voted for {voted_user.name} with DB id: {next_vote_id}")
             
             motm_votes = send_sql(f"SELECT month, COUNT(*) AS 'votes' FROM motm_votes WHERE month='{str(datetime.now().month).zfill(2)}' AND year='{datetime.now().year}' GROUP BY month")[0][1]
-            total_gm = send_sql("SELECT rank, COUNT(*) AS 'rank' FROM `discord_users` WHERE rank='Gang Member' GROUP BY rank")[0][1]
+            total_gm = send_sql("SELECT COUNT(*) FROM `discord_users` WHERE rank='Gang Member' OR rank='GM Light'")[0][0]
             
             await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"MotM: {motm_votes} / {total_gm} Voted"))
             
