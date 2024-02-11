@@ -152,11 +152,12 @@ def download_all_pfps():
         else:
             open(f"profilepics/{member.name}.png", "wb").write(requests.get(member.avatar.url, allow_redirects=True).content)
         print("DONE DOWNLOADING " + member.name)
+
     files = os.listdir("profilepics")
-    print("UPLOADING")
     for pfp in files:
+        print("UPLOADING" + pfp)
         GM_sftp.put(f"profilepics/{pfp}", f"img/discord_upload/profilepics/{pfp}")
-    print("DONE UPLOADING")
+        print("DONE UPLOADING " + pfp)
     transport.close()
     print("DONE")
 
