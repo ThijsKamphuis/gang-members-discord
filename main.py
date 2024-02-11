@@ -146,17 +146,17 @@ async def on_guild_role_update(before, after):
 def download_all_pfps():
     GM_sftp, transport = open_sftp()
     for member in (bot.get_guild(gm_guild_id).members):
-        print("DOWNLOADING" + member.name)
+        print("DOWNLOADING " + member.name)
         if member.avatar == None:
             open(f"profilepics/{member.name}.png", "wb").write(requests.get(member.display_avatar.url, allow_redirects=True).content)
         else:
             open(f"profilepics/{member.name}.png", "wb").write(requests.get(member.avatar.url, allow_redirects=True).content)
-        print("DONE DOWNLOADING" + member.name)
-        files = os.listdir("profilepics")
-        print("UPLOADING")
-        for pfp in files:
-            GM_sftp.put(f"profilepics/{pfp}", f"img/discord_upload/profilepics/{pfp}")
-        print("DONE UPLOADING")
+        print("DONE DOWNLOADING " + member.name)
+    files = os.listdir("profilepics")
+    print("UPLOADING")
+    for pfp in files:
+        GM_sftp.put(f"profilepics/{pfp}", f"img/discord_upload/profilepics/{pfp}")
+    print("DONE UPLOADING")
     transport.close()
     print("DONE")
 
