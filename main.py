@@ -75,10 +75,7 @@ async def on_connect():
 async def on_ready():
     print(f'We have logged in as {bot.user}')
     print()
-    
-    member = bot.get_guild(gm_guild_id).get_member(327856498174853121)
-     
-    print(member.roles)
+
 
 #### ON MEMBER JOIN #########################################################
 @bot.event
@@ -147,13 +144,20 @@ async def on_guild_role_update(before, after):
 
 #### PROFILE PICS ######################################################################
 def download_all_pfps():
+    GM_sftp, transport = open_sftp()
     for member in (bot.get_guild(gm_guild_id).members):
-        print(member.name)
+        print("DOWNLOADING" + member.name)
         if member.avatar == None:
             open(f"profilepics/{member.name}.png", "wb").write(requests.get(member.display_avatar.url, allow_redirects=True).content)
         else:
-            open(f"profilepics/{member.name}.png", "wb").write(requests.get(member.avatar.url, allow_redirects=True).content)      
-
+            open(f"profilepics/{member.name}.png", "wb").write(requests.get(member.avatar.url, allow_redirects=True).content)
+        print("DONE DOWNLOADING" + member.name)
+        files = os.listdir("profilepics")
+        print("UPLOADING" + member.name)
+        GM_sftp.put(f"profilepics/{files[member.name]}", f"img/discord_upload/profilepics/{member.name}")
+        print("DONE UPLOADING" + member.name)
+    transport.close()
+    print("DONE")
 
 def download_user_pfp(member):
     if member.avatar == None:
@@ -161,15 +165,6 @@ def download_user_pfp(member):
     else:
         open(f"profilepics/{member.name}.png", "wb").write(requests.get(member.avatar.url, allow_redirects=True).content)
 
-
-def upload_all_pfps():
-    GM_sftp, transport = open_sftp()
-    
-    files = os.listdir("profilepics")
-    for pfp in files:
-        GM_sftp.put(f"profilepics/{pfp}", f"img/discord_upload/profilepics/{pfp}")
-    transport.close()
-    print("Uploaded all Pfps")
 
 def upload_user_pfp(member):
     GM_sftp, transport = open_sftp()
