@@ -40,7 +40,7 @@ class birthday(commands.Cog):
                 
 
     @commands.slash_command(name="nextbirthdays", description="View upcoming birthdays.")
-    async def nextbirthdays(self, ctx: discord.ApplicationContext):
+    async def nextbirthdays(self, ctx: discord.ApplicationContext, page: int = 1):
         sql_birthdaysdb = send_sql("SELECT userid, birthday FROM `discord_users` WHERE birthday != 0")
         
         og_birthdaysdb = {}
@@ -50,28 +50,36 @@ class birthday(commands.Cog):
         birthdays = {k: v[:-4] + str(datetime.now().year) for k, v in og_birthdaysdb.items()}
         birthdays = {k: (datetime.strptime(v, "%d-%m-%Y") - datetime.now()).days + 1 for k, v in birthdays.items()}
 
-
         for k, v in birthdays.items():
             if v < 0:
                 birthdays[k] += 365
 
-
         days_birthdays = dict(sorted(birthdays.items(), key=lambda x: x[1]))
         sorted_birthdays = {k: og_birthdaysdb[k] for k, v in days_birthdays.items()}
-        
+
+        num_pages = (len(sorted_birthdays) - 1) // 10 + 1
+
+        if page < 1 or page > num_pages:
+            await ctx.respond("Invalid page number.", ephemeral=True)
+            return
+
+        start_index = (page - 1) * 10
+        end_index = start_index + 10
+
         birthdays_embed = discord.Embed(
             title= "Upcoming birthdays",
             color=0xae8cff
         )
         birthdays_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/914862282335453215/1067193702038110228/favicon.png")
-        
-        for birthday in sorted_birthdays:
+
+        for birthday in list(sorted_birthdays.keys())[start_index:end_index]:
             birthdays_embed.add_field(
                 name= f"{self.bot.get_guild(gm_guild_id).get_member(int(birthday)).name} {f'({self.bot.get_guild(gm_guild_id).get_member(int(birthday)).nick})' if self.bot.get_guild(gm_guild_id).get_member(int(birthday)).nick else ''}",
                 value=f"""Turns {datetime.now().year - datetime.strptime(sorted_birthdays[birthday][-4:], '%Y').year if datetime.strptime(sorted_birthdays[birthday], '%d-%m-%Y').replace(year=datetime.today().year) >= datetime.today() else ((datetime.now().year - datetime.strptime(sorted_birthdays[birthday][-4:], '%Y').year) + 1)} in {days_birthdays[birthday]} days, {datetime.strptime(sorted_birthdays[birthday], '%d-%m-%Y').strftime('%d-%b-%Y')}""",
                 inline=False
             )
           
+        birthdays_embed.set_footer(text=f"Page {page}/{num_pages}")
         await ctx.respond(embed=birthdays_embed, ephemeral=True)
     
     

@@ -21,6 +21,7 @@ Regular_id = 1065394897835794453
 NPC_id = 882251536653230151
 Bot_id = 882253119063470133
 
+
 def get_quote_page(page):
         quote_list = send_sql("SELECT * FROM quotes ORDER BY id ASC")
 
