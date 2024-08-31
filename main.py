@@ -44,7 +44,7 @@ special_roles = [
     882248427298230292,  #GM Admin
     1062507887718567986, #MotM
     1088792450950238229, #Chess Champion
-    1067195296993517568, #GM Staff
+    1067195296993517568, #GM Verhuisservice/staff
     910637039605657600,  #Moderator
     1059968168493318198, #GM Dev
     1054113909268819998, #roze
@@ -58,8 +58,14 @@ special_roles = [
     1116098626603716609, #Vis van de dag
     1100852249187594260, #Background NPC
     1096558106495954975, #GM Team
-    
+    1229517781330825236, #Poep Bruine Menno
+    910637039605657600, #Bot met rechten
+    1096558106495954975, #GM CS TEAM
+    1233135700329893969, #GM CS ACADEMY
+    1279517072665350248, #Based
+    1166472445285367950,#Koude Pizza
 ]
+
 
 #### STARTUP ###############################################################
 @bot.event
@@ -383,32 +389,6 @@ async def on_message(message):
         ch = await bot.fetch_channel(1132783367444758578)
         await ch.send(embed=embed)  
         
-#### POLISHMOMENTS ####################################################################################
-@bot.slash_command(name="addpolishmoment", description='Add Polishmoment')
-async def addpolishmoment(ctx: discord.ApplicationContext, polishgif: discord.Attachment):
-    if not polishgif.content_type == 'image/gif':
-        await ctx.respond("ONLY UPLOAD GIF KURWA", ephemeral= True)
-        return
-    
-    await polishgif.save(f"polishmoments/{polishgif.filename}")
-    await ctx.respond("GIF UPLOADED", ephemeral= True)
- 
-    GM_sftp, transport = open_sftp()
-    GM_sftp.put(f"polishmoments/{polishgif.filename}", f"img/discord_upload/polishmoments/{polishgif.filename}")
-    transport.close()
-    
-    send_sql(f"INSERT INTO polish_moments(link) VALUES ('https://gangmembers.eu/img/discord_upload/polishmoments/{polishgif.filename}')")
-
-
-@bot.slash_command(name="polishmoment", description='Random Polishmoment')
-async def polishmoment(ctx: discord.ApplicationContext):
-    randomgif = random.sample(send_sql("SELECT * FROM polish_moments"), 1)[0][0]
-    await ctx.respond(randomgif)
-    return
-      
-    
-
-    
 
 #### FUNCTIONS #############################################################
 def parse_sql(data):
