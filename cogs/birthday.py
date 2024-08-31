@@ -80,29 +80,8 @@ class birthday(commands.Cog):
             )
           
         birthdays_embed.set_footer(text=f"Page {page}/{num_pages}")
-        
-        # Add buttons to change pages
-        if num_pages > 1:
-            previous_button = discord.ui.button(label="Next", style=discord.ButtonStyle.primary, emoji="➡")
-            next_button = discord.ui.button(label="Prev", style=discord.ButtonStyle.primary, emoji="⬅")
-            
-            if page > 1:
-                previous_button.disabled = False
-            else:
-                previous_button.disabled = True
-                
-            if page < num_pages:
-                next_button.disabled = False
-            else:
-                next_button.disabled = True
-                
-            view = discord.ui.View()
-            view.add_item(previous_button)
-            view.add_item(next_button)
-            
-            await ctx.respond(embed=birthdays_embed, view=view, ephemeral=True)
-        else:
-            await ctx.respond(embed=birthdays_embed, ephemeral=True)
+        await ctx.respond(embed=birthdays_embed, ephemeral=True)
+    
     
     
     
