@@ -35,7 +35,7 @@ class motm(commands.Cog):
     async def on_ready(self):
         self.refresh_MOTM.start()
         self.check_for_month.start()
-        self.check_for_month(self)
+        await self.check_for_month(self)
         
     def get_motm(self) -> discord.Member:
         motm = self.bot.get_guild(gm_guild_id).get_role(motm_role_id).members[0]
